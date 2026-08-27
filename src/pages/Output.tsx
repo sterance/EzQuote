@@ -1,8 +1,8 @@
 import { Box } from "@mui/material";
 import { useMemo, useState } from "react";
+import { useTemplateStore } from "../hooks/useTemplateStore";
 import Buttons from "../components/Buttons";
 import Textbox from "../components/Textbox";
-import { buttonGroups } from "../data/buttonGroups";
 
 function fillTemplate(template: string, fills: Record<string, string>) {
   return template.replace(
@@ -12,6 +12,7 @@ function fillTemplate(template: string, fills: Record<string, string>) {
 }
 
 export default function Output() {
+  const { groups } = useTemplateStore();
   const [selections, setSelections] = useState<Record<string, string>>({});
   const [enabledGroups, setEnabledGroups] = useState<Record<string, boolean>>(
     {},
@@ -26,25 +27,25 @@ export default function Output() {
   };
 
   const output = useMemo(() => {
-    return buttonGroups
+    return groups
       .map((group) => {
         if (!enabledGroups[group.id]) return null;
         const selectedOptionId = selections[group.id];
-        const option = group.options.find((o) => o.id === selectedOptionId);
+        const option = group.buttons.find((o) => o.id === selectedOptionId);
         return option ? fillTemplate(group.template, option.fills) : null;
       })
       .filter((line): line is string => Boolean(line))
       .join("\n\n");
-  }, [selections, enabledGroups]);
+  }, [selections, enabledGroups, groups]);
 
   return (
     <>
       <Box className="button-sections">
-        {buttonGroups.map((group) => (
+        {groups.map((group) => (
           <Buttons
             key={group.id}
             label={group.label}
-            options={group.options.map(({ id, label }) => ({ id, label }))}
+            options={group.buttons.map(({ id, label }) => ({ id, label }))}
             selectedId={selections[group.id]}
             onSelect={(optionId) => handleSelect(group.id, optionId)}
             enabled={Boolean(enabledGroups[group.id])}

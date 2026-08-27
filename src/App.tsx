@@ -3,6 +3,7 @@ import { Box, IconButton } from "@mui/material";
 import { useState } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
 import Output from "./pages/Output";
+import { Templates } from "./pages/Templates";
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -30,7 +31,7 @@ function App() {
       <Box component="main" className="main-content">
         <Routes>
           <Route path="/output" element={<Output />} />
-          <Route path="/templates" element={null} />
+          <Route path="/templates" element={<Templates />} />
           <Route path="*" element={<Output />} />
         </Routes>
       </Box>
