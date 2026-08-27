@@ -1,0 +1,80 @@
+export interface ButtonOption {
+  id: string;
+  label: string;
+  fills: Record<string, string>;
+}
+
+export interface ButtonGroupConfig {
+  id: string;
+  label: string;
+  template: string;
+  options: ButtonOption[];
+}
+
+export const buttonGroups: ButtonGroupConfig[] = [
+  {
+    id: "cable-damage",
+    label: "Broken Cable",
+    template:
+      "Your cable has {condition}, and this will require {requirement}.",
+    options: [
+      {
+        id: "flooded",
+        label: "Flooded",
+        fills: {
+          condition: "flooded",
+          requirement:
+            "drying out and inspection before it can be safely reused",
+        },
+      },
+      {
+        id: "cut",
+        label: "Cut",
+        fills: {
+          condition: "been cut",
+          requirement: "a splice or full replacement of the affected section",
+        },
+      },
+      {
+        id: "broken-pins",
+        label: "Broken pins",
+        fills: {
+          condition: "broken pins",
+          requirement: "replacement of the connector",
+        },
+      },
+    ],
+  },
+  {
+    id: "pool-robot",
+    label: "Pool Robot",
+    template:
+      "Your pool robot has {condition}, and this will require {requirement}.",
+    options: [
+      {
+        id: "not-charging",
+        label: "Not Charging",
+        fills: {
+          condition: "not holding a charge",
+          requirement: "battery testing and likely replacement",
+        },
+      },
+      {
+        id: "tracks-slipping",
+        label: "Tracks Slipping",
+        fills: {
+          condition: "slipping tracks",
+          requirement: "track and drive belt inspection or replacement",
+        },
+      },
+      {
+        id: "impeller-jam",
+        label: "Impeller Jam",
+        fills: {
+          condition: "a jammed impeller",
+          requirement: "clearing debris and inspecting the impeller for damage",
+        },
+      },
+    ],
+  },
+];

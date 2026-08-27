@@ -4,9 +4,10 @@ import TextField from "@mui/material/TextField";
 interface TextboxProps {
   label: string;
   placeholder?: string;
+  value?: string;
 }
 
-export default function Textbox({ label, placeholder }: TextboxProps) {
+export default function Textbox({ label, placeholder, value }: TextboxProps) {
   return (
     <Box
       component="form"
@@ -19,7 +20,10 @@ export default function Textbox({ label, placeholder }: TextboxProps) {
           id="outlined-textarea"
           label={label}
           placeholder={placeholder}
+          value={value ?? ""}
           multiline
+          minRows={4}
+          slotProps={{ input: { readOnly: true } }}
         />
       </div>
     </Box>

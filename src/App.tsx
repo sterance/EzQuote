@@ -1,11 +1,43 @@
 import "./App.css";
 import { Box, IconButton } from "@mui/material";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Textbox from "./components/Textbox";
 import Buttons from "./components/Buttons";
+import { buttonGroups } from "./data/buttonGroups";
+
+function fillTemplate(template: string, fills: Record<string, string>) {
+  return template.replace(
+    /\{(\w+)\}/g,
+    (_, key: string) => fills[key] ?? `{${key}}`,
+  );
+}
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [selections, setSelections] = useState<Record<string, string>>({});
+  const [enabledGroups, setEnabledGroups] = useState<Record<string, boolean>>(
+    {},
+  );
+
+  const handleSelect = (groupId: string, optionId: string) => {
+    setSelections((current) => ({ ...current, [groupId]: optionId }));
+  };
+
+  const handleToggleGroup = (groupId: string, enabled: boolean) => {
+    setEnabledGroups((current) => ({ ...current, [groupId]: enabled }));
+  };
+
+  const output = useMemo(() => {
+    return buttonGroups
+      .map((group) => {
+        if (!enabledGroups[group.id]) return null;
+        const selectedOptionId = selections[group.id];
+        const option = group.options.find((o) => o.id === selectedOptionId);
+        return option ? fillTemplate(group.template, option.fills) : null;
+      })
+      .filter((line): line is string => Boolean(line))
+      .join("\n\n");
+  }, [selections, enabledGroups]);
 
   return (
     <Box className="app-shell" data-theme={isDarkMode ? "dark" : "light"}>
@@ -25,17 +57,22 @@ function App() {
 
       <Box component="main" className="main-content">
         <Box className="button-sections">
-          <Buttons
-            label="Broken Cable"
-            buttons={[
-              { text: "Flooded" },
-              { text: "Cut" },
-              { text: "Broken pins" },
-            ]}
-          />
+          {buttonGroups.map((group) => (
+            <Buttons
+              key={group.id}
+              label={group.label}
+              options={group.options.map(({ id, label }) => ({ id, label }))}
+              selectedId={selections[group.id]}
+              onSelect={(optionId) => handleSelect(group.id, optionId)}
+              enabled={Boolean(enabledGroups[group.id])}
+              onToggleEnabled={(enabled) =>
+                handleToggleGroup(group.id, enabled)
+              }
+            />
+          ))}
         </Box>
 
-        <Textbox label="Output" placeholder="" />
+        <Textbox label="Output" placeholder="" value={output} />
       </Box>
     </Box>
   );
