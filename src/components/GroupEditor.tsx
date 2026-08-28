@@ -81,16 +81,16 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
   const groupTags = extractTags(group.template);
 
   return (
-    <Paper ref={setNodeRef} style={style} sx={{ overflow: "hidden" }}>
+    <Paper ref={setNodeRef} className="tmpl-card" style={style} sx={{ overflow: "hidden" }}>
       <Box
         sx={{
-          bgcolor: "grey.100",
+          bgcolor: "var(--surface)",
           p: 2,
           display: "flex",
           flexDirection: "column",
           gap: 1,
           borderBottom: 1,
-          borderColor: "divider",
+          borderColor: "var(--border)",
         }}
       >
         {isEditing ? (
@@ -187,7 +187,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
               variant="caption"
               sx={{
                 fontFamily: "monospace",
-                bgcolor: "grey.200",
+                bgcolor: "var(--surface-muted)",
                 p: 1,
                 borderRadius: 1,
                 cursor: "pointer",
@@ -212,7 +212,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
         <Box
           sx={{
             p: 2,
-            bgcolor: "grey.50",
+            bgcolor: "var(--surface-muted)",
             display: "flex",
             flexDirection: "column",
             gap: 2,

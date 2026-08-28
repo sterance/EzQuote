@@ -1,8 +1,12 @@
-import { Box, Button } from "@mui/material";
-import { useMemo, useState } from "react";
+import { Alert, Box, Button, Snackbar } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
 import { useTemplateStore } from "../hooks/useTemplateStore";
 import Buttons from "../components/Buttons";
+import FillableGroup from "../components/FillableGroup";
 import Textbox from "../components/Textbox";
+import { extractTags } from "../utils/templateUtils";
+
+const STORAGE_KEY = "output_data";
 
 function fillTemplate(template: string, fills: Record<string, string>) {
   return template.replace(
@@ -13,10 +17,51 @@ function fillTemplate(template: string, fills: Record<string, string>) {
 
 export default function Output() {
   const { groups } = useTemplateStore();
-  const [selections, setSelections] = useState<Record<string, string>>({});
+  const [selections, setSelections] = useState<Record<string, string>>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.selections ?? {};
+      } catch {
+        console.error("Failed to parse local storage data.");
+      }
+    }
+    return {};
+  });
   const [enabledGroups, setEnabledGroups] = useState<Record<string, boolean>>(
-    {},
+    () => {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          return parsed.enabledGroups ?? {};
+        } catch {
+          console.error("Failed to parse local storage data.");
+        }
+      }
+      return {};
+    },
   );
+  const [textFills, setTextFills] = useState<Record<string, string>>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.textFills ?? {};
+      } catch {
+        console.error("Failed to parse local storage data.");
+      }
+    }
+    return {};
+  });
+
+  useEffect(() => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ selections, enabledGroups, textFills }),
+    );
+  }, [selections, enabledGroups, textFills]);
 
   const handleSelect = (groupId: string, optionId: string) => {
     setSelections((current) => ({ ...current, [groupId]: optionId }));
@@ -26,40 +71,86 @@ export default function Output() {
     setEnabledGroups((current) => ({ ...current, [groupId]: enabled }));
   };
 
+  const handleTextChange = (groupId: string, value: string) => {
+    setTextFills((current) => ({ ...current, [groupId]: value }));
+  };
+
   const output = useMemo(() => {
     return groups
       .map((group) => {
         if (!enabledGroups[group.id]) return null;
+
+        if (group.buttons.length === 0) {
+          const tags = extractTags(group.template);
+          if (tags.length === 0) {
+            return group.template;
+          }
+          const fills: Record<string, string> = {};
+          const value = textFills[group.id] ?? "";
+          for (const tag of tags) {
+            fills[tag] = value;
+          }
+          return fillTemplate(group.template, fills);
+        }
+
         const selectedOptionId = selections[group.id];
         const option = group.buttons.find((o) => o.id === selectedOptionId);
         return option ? fillTemplate(group.template, option.fills) : null;
       })
       .filter((line): line is string => Boolean(line))
       .join("\n\n");
-  }, [selections, enabledGroups, groups]);
+  }, [selections, enabledGroups, groups, textFills]);
+
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(output);
-    } catch (err) {
-      alert("Failed to copy to clipboard. Please copy manually.");
+      setSnackbar({ open: true, message: "Copied to clipboard!", severity: "success" });
+    } catch {
+      setSnackbar({
+        open: true,
+        message: "Failed to copy to clipboard. Please copy manually.",
+        severity: "error",
+      });
     }
+  };
+
+  const handleCloseSnackbar = (_: unknown, reason?: string) => {
+    if (reason === "clickaway") return;
+    setSnackbar((current) => ({ ...current, open: false }));
   };
 
   return (
     <>
       <Box className="button-sections">
-        {groups.map((group) => (
-          <Buttons
-            key={group.id}
-            label={group.label}
-            options={group.buttons.map(({ id, label }) => ({ id, label }))}
-            selectedId={selections[group.id]}
-            onSelect={(optionId) => handleSelect(group.id, optionId)}
-            enabled={Boolean(enabledGroups[group.id])}
-            onToggleEnabled={(enabled) => handleToggleGroup(group.id, enabled)}
-          />
-        ))}
+        {groups.map((group) =>
+          group.buttons.length === 0 ? (
+            <FillableGroup
+              key={group.id}
+              label={group.label}
+              template={group.template}
+              value={textFills[group.id] ?? ""}
+              enabled={Boolean(enabledGroups[group.id])}
+              onChange={(value) => handleTextChange(group.id, value)}
+              onToggleEnabled={(enabled) => handleToggleGroup(group.id, enabled)}
+            />
+          ) : (
+            <Buttons
+              key={group.id}
+              label={group.label}
+              options={group.buttons.map(({ id, label }) => ({ id, label }))}
+              selectedId={selections[group.id]}
+              onSelect={(optionId) => handleSelect(group.id, optionId)}
+              enabled={Boolean(enabledGroups[group.id])}
+              onToggleEnabled={(enabled) => handleToggleGroup(group.id, enabled)}
+            />
+          ),
+        )}
       </Box>
 
       <Textbox label="Output" placeholder="" value={output} />
@@ -73,6 +164,21 @@ export default function Output() {
           Copy to Clipboard
         </Button>
       </Box>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

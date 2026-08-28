@@ -124,12 +124,11 @@ export const Templates: React.FC = () => {
       <Button
         fullWidth
         variant="outlined"
+        className="tmpl-add-group"
         sx={{
           borderStyle: "dashed",
           py: 1.5,
           mt: 2,
-          color: "text.secondary",
-          "&:hover": { bgcolor: "action.hover", color: "text.primary" },
         }}
         onClick={addGroup}
       >

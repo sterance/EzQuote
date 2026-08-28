@@ -7,7 +7,7 @@ import {
 } from "../utils/templateUtils";
 import { buttonGroups as defaultButtonGroups } from "../data/buttonGroups";
 
-const STORAGE_KEY = "pool1_template_data";
+const STORAGE_KEY = "template_data";
 
 export const useTemplateStore = () => {
   const [groups, setGroups] = useState<ButtonGroup[]>(() => {
@@ -15,7 +15,7 @@ export const useTemplateStore = () => {
     if (saved) {
       try {
         return JSON.parse(saved);
-      } catch (e) {
+      } catch {
         console.error("Failed to parse local storage data.");
       }
     }
@@ -148,7 +148,7 @@ export const useTemplateStore = () => {
         return true;
       }
       return false;
-    } catch (e) {
+    } catch {
       return false;
     }
   };
