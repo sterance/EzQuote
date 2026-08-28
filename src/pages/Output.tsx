@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useMemo, useState } from "react";
 import { useTemplateStore } from "../hooks/useTemplateStore";
 import Buttons from "../components/Buttons";
@@ -38,6 +38,14 @@ export default function Output() {
       .join("\n\n");
   }, [selections, enabledGroups, groups]);
 
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(output);
+    } catch (err) {
+      alert("Failed to copy to clipboard. Please copy manually.");
+    }
+  };
+
   return (
     <>
       <Box className="button-sections">
@@ -55,6 +63,16 @@ export default function Output() {
       </Box>
 
       <Textbox label="Output" placeholder="" value={output} />
+      <Box sx={{ mt: 1, display: "flex", justifyContent: "center" }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleCopy}
+          disabled={!output}
+        >
+          Copy to Clipboard
+        </Button>
+      </Box>
     </>
   );
 }

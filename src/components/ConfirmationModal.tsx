@@ -1,4 +1,12 @@
 import React from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+} from "@mui/material";
 
 interface Props {
   isOpen: boolean;
@@ -16,25 +24,30 @@ export const ConfirmationModal: React.FC<Props> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-md shadow-lg max-w-sm w-full">
-        <h3 className="text-lg font-semibold mb-4 text-red-600">Warning</h3>
-        <p className="mb-6 text-gray-700">{message}</p>
-        <div className="flex justify-end gap-3">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 border rounded hover:bg-gray-100"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          >
-            Confirm
-          </button>
-        </div>
-      </div>
-    </div>
+    <Dialog
+      open={isOpen}
+      onClose={onCancel}
+      maxWidth="sm"
+      fullWidth
+      aria-labelledby="confirmation-modal-title"
+      aria-describedby="confirmation-modal-description"
+    >
+      <DialogTitle id="confirmation-modal-title" color="error">
+        Warning
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText id="confirmation-modal-description">
+          {message}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onCancel} variant="outlined">
+          Cancel
+        </Button>
+        <Button onClick={onConfirm} variant="contained" color="error">
+          Confirm
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };

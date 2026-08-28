@@ -61,11 +61,20 @@ export const useTemplateStore = () => {
     setGroups((prev) => prev.filter((g) => g.id !== groupId));
   };
 
+  const reorderGroups = (startIndex: number, endIndex: number) => {
+    setGroups((prev) => {
+      const result = Array.from(prev);
+      const [removed] = result.splice(startIndex, 1);
+      result.splice(endIndex, 0, removed);
+      return result;
+    });
+  };
+
   const addGroup = () => {
     const newGroup: ButtonGroup = {
       id: generateId("New Group"),
       label: "New Group",
-      template: "Hello {name}",
+      template: "",
       buttons: [],
     };
     setGroups((prev) => [...prev, newGroup]);
@@ -153,5 +162,6 @@ export const useTemplateStore = () => {
     deleteChild,
     addChild,
     importData,
+    reorderGroups,
   };
 };
