@@ -153,6 +153,18 @@ export const useTemplateStore = () => {
     }
   };
 
+  const clearAll = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setGroups(
+      defaultButtonGroups.map((group) => ({
+        id: group.id,
+        label: group.label,
+        template: group.template,
+        options: group.options as ChildOption[],
+      })),
+    );
+  };
+
   return {
     groups,
     updateGroup,
@@ -163,5 +175,6 @@ export const useTemplateStore = () => {
     addChild,
     importData,
     reorderGroups,
+    clearAll,
   };
 };

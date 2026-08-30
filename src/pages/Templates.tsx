@@ -27,6 +27,7 @@ export const Templates: React.FC = () => {
     addChild,
     importData,
     reorderGroups,
+    clearAll,
   } = useTemplateStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -85,6 +86,10 @@ export const Templates: React.FC = () => {
     };
     reader.readAsText(file);
     e.target.value = "";
+  };
+
+  const handleClear = () => {
+    clearAll();
   };
 
   return (
@@ -148,12 +153,31 @@ export const Templates: React.FC = () => {
         />
         <Button
           variant="contained"
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() =>
+            groups.length > 0
+              ? confirmAction(
+                  "Are you sure you want to import templates? This will overwrite all existing templates.",
+                  () => fileInputRef.current?.click(),
+                )
+              : fileInputRef.current?.click()
+          }
         >
           Import Templates
         </Button>
         <Button variant="contained" onClick={handleExport}>
           Export Templates
+        </Button>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={() =>
+            confirmAction(
+              "Are you sure you want to clear all templates? This will reset to defaults and cannot be undone.",
+              handleClear,
+            )
+          }
+        >
+          Clear Templates
         </Button>
       </Stack>
 

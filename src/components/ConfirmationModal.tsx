@@ -21,14 +21,13 @@ export const ConfirmationModal: React.FC<Props> = ({
   onConfirm,
   onCancel,
 }) => {
-  if (!isOpen) return null;
-
   return (
     <Dialog
       open={isOpen}
       onClose={onCancel}
       maxWidth="sm"
       fullWidth
+      className="confirmation-modal"
       aria-labelledby="confirmation-modal-title"
       aria-describedby="confirmation-modal-description"
     >

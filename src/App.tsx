@@ -8,6 +8,12 @@ import { Templates } from "./pages/Templates";
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
+  const toggleTheme = () => {
+    const next = !isDarkMode;
+    setIsDarkMode(next);
+    document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
+  };
+
   return (
     <Box className="app-shell" data-theme={isDarkMode ? "dark" : "light"}>
       <Box component="nav" className="top-nav" aria-label="Main navigation">
@@ -22,7 +28,7 @@ function App() {
             isDarkMode ? "Switch to light mode" : "Switch to dark mode"
           }
           title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-          onClick={() => setIsDarkMode((current) => !current)}
+          onClick={toggleTheme}
         >
           <span aria-hidden="true">{isDarkMode ? "☀" : "☾"}</span>
         </IconButton>

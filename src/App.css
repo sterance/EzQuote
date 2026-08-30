@@ -1,4 +1,4 @@
-.app-shell {
+:root {
   --page-bg: #f5f1e8;
   --surface: #fffdf8;
   --surface-muted: #e8efec;
@@ -8,15 +8,9 @@
   --accent: #d95d39;
   --nav-bg: #173b40;
   --nav-text: #f5f1e8;
-  min-height: 100svh;
-  color: var(--text);
-  background: var(--page-bg);
-  transition:
-    color 180ms ease,
-    background-color 180ms ease;
 }
 
-.app-shell[data-theme="dark"] {
+:root[data-theme="dark"] {
   --page-bg: #101b20;
   --surface: #17272d;
   --surface-muted: #20383b;
@@ -26,6 +20,18 @@
   --accent: #f28a5f;
   --nav-bg: #0b1519;
   --nav-text: #edf1e8;
+}
+
+.app-shell {
+  min-height: 100svh;
+  color: var(--text);
+  background: var(--page-bg);
+  transition:
+    color 180ms ease,
+    background-color 180ms ease;
+}
+
+.app-shell[data-theme="dark"] {
   background: var(--page-bg);
 }
 
@@ -152,7 +158,6 @@ h1 {
   border-color: var(--border);
   color: var(--text);
   flex: 1;
-  min-height: 44px;
   text-transform: none;
 }
 
@@ -254,4 +259,29 @@ h1 {
   background: var(--surface-muted) !important;
   border-color: var(--accent) !important;
   color: var(--text) !important;
+}
+
+.confirmation-modal .MuiDialog-paper {
+  background: var(--surface) !important;
+  background-image: none !important;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.confirmation-modal .MuiDialogTitle-root {
+  color: var(--accent);
+}
+
+.confirmation-modal .MuiDialogContentText-root {
+  color: var(--text);
+}
+
+.confirmation-modal .MuiButton-outlined {
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.confirmation-modal .MuiButton-outlined:hover {
+  background: var(--surface-muted);
+  border-color: var(--accent);
 }
