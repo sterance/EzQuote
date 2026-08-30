@@ -119,7 +119,11 @@ export default function Output() {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(output);
+      if (window.electronAPI?.writeClipboardText) {
+        await window.electronAPI.writeClipboardText(output);
+      } else {
+        await navigator.clipboard.writeText(output);
+      }
       setSnackbar({
         open: true,
         message: "Copied to clipboard!",

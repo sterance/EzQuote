@@ -3,11 +3,17 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "electron/main.cjs",
+  "author": "Your Name",
+  "description": "Pool equipment repair canned-response builder",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:electron:renderer": "tsc -b && vite build --mode electron",
+    "electron:pack": "electron-builder --win portable --publish=never",
+    "build:electron": "npm run build:electron:renderer && npm run electron:pack"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -26,6 +32,8 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.1.0",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0",
     "eslint": "^10.9.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.4",
@@ -33,5 +41,25 @@
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.67.0",
     "vite": "^8.2.2"
+  },
+  "build": {
+    "appId": "com.pool1.app",
+    "productName": "Pool1",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist-electron-renderer/**/*",
+      "electron/**/*"
+    ],
+    "win": {
+      "target": [
+        "portable"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}.exe"
+    }
   }
 }
