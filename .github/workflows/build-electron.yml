@@ -2,7 +2,11 @@ name: Build Electron Windows EXE
 
 on:
   push:
+    branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build-windows:
@@ -29,11 +33,12 @@ jobs:
       - name: Copy sample templates alongside executable
         run: Copy-Item -Path "src/data/sample-templates.json" -Destination "release/sample-templates.json"
 
-      - name: Upload EXE artifact
-        uses: actions/upload-artifact@v6
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: pool1-windows-exe
-          path: |
+          tag_name: latest
+          name: Latest Build
+          prerelease: true
+          files: |
             release/*.exe
             release/sample-templates.json
-          retention-days: 14
