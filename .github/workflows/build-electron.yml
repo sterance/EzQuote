@@ -27,7 +27,7 @@ jobs:
         run: npm run electron:pack
 
       - name: Upload EXE artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: pool1-windows-exe
           path: release/*.exe
