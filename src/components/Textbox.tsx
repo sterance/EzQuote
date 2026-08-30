@@ -11,7 +11,7 @@ export default function Textbox({ label, placeholder, value }: TextboxProps) {
   return (
     <Box
       component="form"
-      sx={{ width: "100%", "& .MuiTextField-root": { mb: 1, width: "100%" } }}
+      sx={{ width: "100%", "& .MuiTextField-root": { my: 3, width: "100%" } }}
       noValidate
       autoComplete="off"
     >

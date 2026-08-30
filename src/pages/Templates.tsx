@@ -88,7 +88,7 @@ export const Templates: React.FC = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: "1200px", mx: "auto", p: 3 }}>
+    <Box sx={{ mx: "auto" }}>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}

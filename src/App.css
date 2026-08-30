@@ -86,8 +86,8 @@
 .main-content {
   box-sizing: border-box;
   margin: 0 auto;
-  max-width: 920px;
-  padding: clamp(48px, 9vw, 104px) clamp(20px, 6vw, 72px);
+  max-width: 100%;
+  padding: clamp(24px, 4.5vw, 52px) clamp(20px, 6vw, 72px);
 }
 
 .intro {
@@ -126,7 +126,6 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  margin-top: 54px;
   padding: 24px;
 }
 
@@ -162,8 +161,16 @@ h1 {
   border-color: var(--accent);
 }
 
+.button-sections .MuiButtonGroup-grouped:not(:last-of-type) {
+  border-right: 1px solid var(--border) !important;
+}
+
+.button-sections .MuiButtonGroup-grouped:not(:last-of-type):hover {
+  border-right-color: var(--accent) !important;
+}
+
 .main-content .MuiTextField-root {
-  margin: 20px 0 0;
+  margin: 0;
   width: 100%;
 }
 

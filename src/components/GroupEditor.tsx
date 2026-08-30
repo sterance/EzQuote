@@ -64,7 +64,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
     const newTags = extractTags(editTemplate);
     const removedTags = oldTags.filter((t) => !newTags.includes(t));
 
-    if (removedTags.length > 0 && group.buttons.length > 0) {
+    if (removedTags.length > 0 && group.options.length > 0) {
       confirmAction(
         `Saving will remove the following option(s): "${removedTags.join(", ")}", and their data. Continue?`,
         () => {
@@ -218,7 +218,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
             gap: 2,
           }}
         >
-          {group.buttons.map((child) => (
+          {group.options.map((child) => (
             <ChildEditor
               key={child.id}
               child={child}

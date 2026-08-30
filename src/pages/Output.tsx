@@ -5,6 +5,7 @@ import Buttons from "../components/Buttons";
 import FillableGroup from "../components/FillableGroup";
 import Textbox from "../components/Textbox";
 import { extractTags } from "../utils/templateUtils";
+import { ConfirmationModal } from "../components/ConfirmationModal";
 
 const STORAGE_KEY = "output_data";
 
@@ -43,7 +44,9 @@ export default function Output() {
       return {};
     },
   );
-  const [textFills, setTextFills] = useState<Record<string, string>>(() => {
+  const [textFills, setTextFills] = useState<
+    Record<string, Record<string, string>>
+  >(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
@@ -71,8 +74,11 @@ export default function Output() {
     setEnabledGroups((current) => ({ ...current, [groupId]: enabled }));
   };
 
-  const handleTextChange = (groupId: string, value: string) => {
-    setTextFills((current) => ({ ...current, [groupId]: value }));
+  const handleTextChange = (groupId: string, tag: string, value: string) => {
+    setTextFills((current) => ({
+      ...current,
+      [groupId]: { ...(current[groupId] ?? {}), [tag]: value },
+    }));
   };
 
   const output = useMemo(() => {
@@ -80,28 +86,32 @@ export default function Output() {
       .map((group) => {
         if (!enabledGroups[group.id]) return null;
 
-        if (group.buttons.length === 0) {
+        if (group.options.length === 0) {
           const tags = extractTags(group.template);
           if (tags.length === 0) {
             return group.template;
           }
           const fills: Record<string, string> = {};
-          const value = textFills[group.id] ?? "";
+          const groupFills = textFills[group.id] ?? {};
           for (const tag of tags) {
-            fills[tag] = value;
+            fills[tag] = groupFills[tag] ?? "";
           }
           return fillTemplate(group.template, fills);
         }
 
         const selectedOptionId = selections[group.id];
-        const option = group.buttons.find((o) => o.id === selectedOptionId);
+        const option = group.options.find((o) => o.id === selectedOptionId);
         return option ? fillTemplate(group.template, option.fills) : null;
       })
       .filter((line): line is string => Boolean(line))
       .join("\n\n");
   }, [selections, enabledGroups, groups, textFills]);
 
-  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({
     open: false,
     message: "",
     severity: "success",
@@ -110,7 +120,11 @@ export default function Output() {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(output);
-      setSnackbar({ open: true, message: "Copied to clipboard!", severity: "success" });
+      setSnackbar({
+        open: true,
+        message: "Copied to clipboard!",
+        severity: "success",
+      });
     } catch {
       setSnackbar({
         open: true,
@@ -125,36 +139,57 @@ export default function Output() {
     setSnackbar((current) => ({ ...current, open: false }));
   };
 
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
+
+  const handleClearAll = () => {
+    setSelections({});
+    setEnabledGroups({});
+    setTextFills({});
+  };
+
   return (
     <>
-      <Box className="button-sections">
+      <Box className="button-sections" sx={{ position: "relative" }}>
+        <Button
+          variant="outlined"
+          color="error"
+          size="small"
+          onClick={() => setClearConfirmOpen(true)}
+          sx={{ position: "absolute", top: 8, right: 8, zIndex: 1 }}
+        >
+          CLEAR ALL
+        </Button>
         {groups.map((group) =>
-          group.buttons.length === 0 ? (
+          group.options.length === 0 ? (
             <FillableGroup
               key={group.id}
               label={group.label}
               template={group.template}
-              value={textFills[group.id] ?? ""}
+              value={textFills[group.id] ?? {}}
               enabled={Boolean(enabledGroups[group.id])}
-              onChange={(value) => handleTextChange(group.id, value)}
-              onToggleEnabled={(enabled) => handleToggleGroup(group.id, enabled)}
+              onChange={(tag, value) => handleTextChange(group.id, tag, value)}
+              onToggleEnabled={(enabled) =>
+                handleToggleGroup(group.id, enabled)
+              }
             />
           ) : (
             <Buttons
               key={group.id}
               label={group.label}
-              options={group.buttons.map(({ id, label }) => ({ id, label }))}
+              options={group.options.map(({ id, label }) => ({ id, label }))}
               selectedId={selections[group.id]}
               onSelect={(optionId) => handleSelect(group.id, optionId)}
               enabled={Boolean(enabledGroups[group.id])}
-              onToggleEnabled={(enabled) => handleToggleGroup(group.id, enabled)}
+              onToggleEnabled={(enabled) =>
+                handleToggleGroup(group.id, enabled)
+              }
             />
           ),
         )}
       </Box>
 
       <Textbox label="Output" placeholder="" value={output} />
-      <Box sx={{ mt: 1, display: "flex", justifyContent: "center" }}>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Button
           variant="contained"
           color="primary"
@@ -164,6 +199,15 @@ export default function Output() {
           Copy to Clipboard
         </Button>
       </Box>
+      <ConfirmationModal
+        isOpen={clearConfirmOpen}
+        message="Are you sure you want to clear all selections?"
+        onConfirm={() => {
+          handleClearAll();
+          setClearConfirmOpen(false);
+        }}
+        onCancel={() => setClearConfirmOpen(false)}
+      />
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}

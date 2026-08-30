@@ -62,7 +62,7 @@ export default function Buttons({
           component="span"
           id={labelId}
           className="button-group-label"
-          sx={{ m: 0 }}
+          sx={{ m: 0, alignSelf: "center" }}
         >
           {label}
         </Box>
@@ -71,7 +71,11 @@ export default function Buttons({
         id={buttonsId}
         variant="outlined"
         aria-labelledby={labelId}
-        sx={{ opacity: enabled ? 1 : 0.55, transition: "opacity 150ms ease" }}
+        sx={{
+          opacity: enabled ? 1 : 0.55,
+          transition: "opacity 150ms ease",
+          gap: "1px",
+        }}
       >
         {options.map((option) => {
           const buttonId = `${buttonsId}-button-${option.id}`;

@@ -23,7 +23,7 @@ export const useTemplateStore = () => {
       id: group.id,
       label: group.label,
       template: group.template,
-      buttons: group.options as ChildOption[],
+      options: group.options as ChildOption[],
     }));
   });
 
@@ -41,7 +41,7 @@ export const useTemplateStore = () => {
         if (group.id !== groupId) return group;
 
         const newTags = extractTags(newTemplate);
-        const updatedButtons = group.buttons.map((btn) => ({
+        const updatedOptions = group.options.map((btn) => ({
           ...btn,
           fills: syncChildFills(btn.fills || {}, newTags),
         }));
@@ -51,7 +51,7 @@ export const useTemplateStore = () => {
           id: generateId(newLabel),
           label: newLabel,
           template: newTemplate,
-          buttons: updatedButtons,
+          options: updatedOptions,
         };
       }),
     );
@@ -75,7 +75,7 @@ export const useTemplateStore = () => {
       id: generateId("New Group"),
       label: "New Group",
       template: "",
-      buttons: [],
+      options: [],
     };
     setGroups((prev) => [...prev, newGroup]);
   };
@@ -91,7 +91,7 @@ export const useTemplateStore = () => {
         if (group.id !== groupId) return group;
         return {
           ...group,
-          buttons: group.buttons.map((btn) =>
+          options: group.options.map((btn) =>
             btn.id === childId
               ? {
                   ...btn,
@@ -112,7 +112,7 @@ export const useTemplateStore = () => {
         if (group.id !== groupId) return group;
         return {
           ...group,
-          buttons: group.buttons.filter((b) => b.id !== childId),
+          options: group.options.filter((b) => b.id !== childId),
         };
       }),
     );
@@ -128,7 +128,7 @@ export const useTemplateStore = () => {
           label: "New Option",
           fills: syncChildFills({}, tags),
         };
-        return { ...group, buttons: [...group.buttons, newChild] };
+        return { ...group, options: [...group.options, newChild] };
       }),
     );
   };
@@ -142,7 +142,7 @@ export const useTemplateStore = () => {
       ) {
         const transformed = parsed.map((group) => ({
           ...group,
-          buttons: group.buttons || group.options || [],
+          options: group.options || [],
         }));
         setGroups(transformed);
         return true;

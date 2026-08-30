@@ -1,16 +1,15 @@
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
 import { useId } from "react";
 import { extractTags } from "../utils/templateUtils";
 
 interface FillableGroupProps {
   label: string;
   template: string;
-  value: string;
+  value: Record<string, string>;
   enabled: boolean;
-  onChange: (value: string) => void;
+  onChange: (tag: string, value: string) => void;
   onToggleEnabled: (enabled: boolean) => void;
 }
 
@@ -33,9 +32,7 @@ export default function FillableGroup({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        "& > *": {
-          m: 1,
-        },
+        gap: 1,
       }}
     >
       <Box
@@ -46,6 +43,10 @@ export default function FillableGroup({
           alignItems: "center",
           cursor: "pointer",
           opacity: enabled ? 1 : 0.55,
+          lineHeight: 1,
+          "& .button-group-label": {
+            lineHeight: 1,
+          },
         }}
       >
         <Checkbox
@@ -53,35 +54,40 @@ export default function FillableGroup({
           size="small"
           checked={enabled}
           onChange={(event) => onToggleEnabled(event.target.checked)}
-          sx={{ p: 0.5 }}
+          sx={{ p: 0.5, alignSelf: "center" }}
         />
         <Box
           component="span"
           id={labelId}
           className="button-group-label"
-          sx={{ m: 0 }}
+          sx={{ m: 0, alignSelf: "center" }}
         >
           {label}
         </Box>
       </Box>
-      {tags.length === 0 ? (
-        enabled ? (
-          <Typography
-            component="p"
-            sx={{ opacity: 1, transition: "opacity 150ms ease" }}
-          >
-            {template}
-          </Typography>
-        ) : null
-      ) : (
-        <Box sx={{ width: "100%", maxWidth: 480, opacity: enabled ? 1 : 0.55, transition: "opacity 150ms ease" }}>
-          <TextField
-            label={tags.join(", ")}
-            value={value}
-            onChange={(event) => onChange(event.target.value)}
-            fullWidth
-            size="small"
-          />
+      {tags.length === 0 ? null : (
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: 480,
+            opacity: enabled ? 1 : 0.55,
+            transition: "opacity 150ms ease",
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 1,
+          }}
+        >
+          {tags.map((tag) => (
+            <TextField
+              key={tag}
+              label={tag}
+              value={value[tag] ?? ""}
+              onChange={(event) => onChange(tag, event.target.value)}
+              size="small"
+              sx={{ flex: "1 1 200px" }}
+            />
+          ))}
         </Box>
       )}
     </Box>
