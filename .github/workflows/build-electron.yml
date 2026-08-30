@@ -26,9 +26,14 @@ jobs:
       - name: Package Windows executable
         run: npm run electron:pack
 
+      - name: Copy sample templates alongside executable
+        run: Copy-Item -Path "src/data/sample-templates.json" -Destination "release/sample-templates.json"
+
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v6
         with:
           name: pool1-windows-exe
-          path: release/*.exe
+          path: |
+            release/*.exe
+            release/sample-templates.json
           retention-days: 14
