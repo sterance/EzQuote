@@ -33,12 +33,13 @@ jobs:
       - name: Copy sample templates alongside executable
         run: Copy-Item -Path "src/data/sample-templates.json" -Destination "release/sample-templates.json"
 
+      - name: Bundle exe and sample data into one zip
+        run: Compress-Archive -Path "release/*.exe","release/sample-templates.json" -DestinationPath "release/Pool1-Windows.zip"
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
           name: Latest Build
           prerelease: true
-          files: |
-            release/*.exe
-            release/sample-templates.json
+          files: release/Pool1-Windows.zip
