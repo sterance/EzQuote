@@ -46,12 +46,12 @@ export const ChildEditor: React.FC<ChildEditorProps> = ({
   if (!isEditing) {
     return (
       <Paper
+        className="child-editor"
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           p: 2,
-          bgcolor: "background.paper",
         }}
       >
         <Box>
@@ -64,22 +64,23 @@ export const ChildEditor: React.FC<ChildEditorProps> = ({
               mt: 1,
             }}
           >
-            {tags.flatMap((tag) => [
-              <Typography
-                key={`${tag}-tag`}
-                variant="caption"
-                sx={{ fontWeight: "bold" }}
-              >
-                {tag}
-              </Typography>,
-              <Chip
-                key={`${tag}-chip`}
-                label={child.fills?.[tag] || "—"}
-                size="small"
-                variant="outlined"
-                sx={{ width: "fit-content" }}
-              />,
-            ])}
+             {tags.flatMap((tag) => [
+               <Typography
+                 key={`${tag}-tag`}
+                 variant="caption"
+                 sx={{ fontWeight: "bold" }}
+                 color="var(--text)"
+               >
+                 {tag}
+               </Typography>,
+               <Chip
+                 key={`${tag}-chip`}
+                 label={child.fills?.[tag] || "—"}
+                 size="small"
+                 variant="outlined"
+                 sx={{ width: "fit-content", color: "var(--text)" }}
+               />,
+             ])}
           </Box>
         </Box>
         <Stack direction="row" spacing={1}>
@@ -110,9 +111,9 @@ export const ChildEditor: React.FC<ChildEditorProps> = ({
   if (isEditing) {
     return (
       <Paper
+        className="child-editor"
         sx={{
           p: 2,
-          bgcolor: "background.paper",
           border: 2,
           borderColor: "primary.light",
         }}

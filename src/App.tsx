@@ -5,12 +5,23 @@ import { NavLink, Route, Routes } from "react-router-dom";
 import Output from "./pages/Output";
 import { Templates } from "./pages/Templates";
 
+const DARK_MODE_KEY = "dark_mode";
+
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem(DARK_MODE_KEY) === "true";
+      document.documentElement.setAttribute("data-theme", saved ? "dark" : "light");
+      return saved;
+    } catch {
+      return false;
+    }
+  });
 
   const toggleTheme = () => {
     const next = !isDarkMode;
     setIsDarkMode(next);
+    localStorage.setItem(DARK_MODE_KEY, String(next));
     document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
   };
 

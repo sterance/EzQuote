@@ -224,6 +224,12 @@ h1 {
   color: var(--text);
 }
 
+.main-content .MuiPaper-root.child-editor {
+  background: var(--surface);
+  background-image: none;
+  color: var(--text);
+}
+
 .main-content .MuiPaper-root.tmpl-card .MuiTypography-root {
   color: var(--text);
 }
