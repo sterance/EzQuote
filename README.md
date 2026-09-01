@@ -1,6 +1,6 @@
 # EzQuote
 
-Desktop application for building canned responses for pool equipment repair.
+Web/desktop application for building canned responses.
 
 ## Features
 
