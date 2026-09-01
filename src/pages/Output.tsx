@@ -107,6 +107,14 @@ export default function Output() {
       .join("\n\n");
   }, [selections, enabledGroups, groups, textFills]);
 
+  const hasDataToClear = useMemo(() => {
+    return (
+      Object.keys(selections).length > 0 ||
+      Object.keys(enabledGroups).length > 0 ||
+      Object.keys(textFills).length > 0
+    );
+  }, [selections, enabledGroups, textFills]);
+
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -159,9 +167,11 @@ export default function Output() {
           color="error"
           size="small"
           onClick={() => setClearConfirmOpen(true)}
+          disabled={!hasDataToClear}
+          className="clear-all-btn"
           sx={{ position: "absolute", top: 8, right: 8, zIndex: 1 }}
         >
-          CLEAR ALL
+          Clear All
         </Button>
         {groups.map((group) =>
           group.options.length === 0 ? (
@@ -195,6 +205,7 @@ export default function Output() {
       <Textbox label="Output" placeholder="" value={output} />
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Button
+          className="copy-clipboard-btn"
           variant="contained"
           color="primary"
           onClick={handleCopy}

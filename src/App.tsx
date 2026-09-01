@@ -1,7 +1,7 @@
 import "./App.css";
 import { Box, IconButton } from "@mui/material";
 import { useState } from "react";
-import { NavLink, Route, Routes } from "react-router-dom";
+import { NavLink, Navigate, Route, Routes } from "react-router-dom";
 import Output from "./pages/Output";
 import { Templates } from "./pages/Templates";
 
@@ -46,11 +46,11 @@ function App() {
       </Box>
 
       <Box component="main" className="main-content">
-        <Routes>
-          <Route path="/output" element={<Output />} />
-          <Route path="/templates" element={<Templates />} />
-          <Route path="*" element={<Output />} />
-        </Routes>
+<Routes>
+           <Route path="/output" element={<Output />} />
+           <Route path="/templates" element={<Templates />} />
+           <Route path="*" element={<Navigate to="/output" replace />} />
+         </Routes>
       </Box>
     </Box>
   );

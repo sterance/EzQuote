@@ -43,6 +43,9 @@
   justify-content: space-between;
   min-height: 68px;
   padding: 0 clamp(20px, 6vw, 88px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .brand-mark {
@@ -161,6 +164,10 @@ h1 {
   text-transform: none;
 }
 
+.button-sections .MuiButton-root.clear-all-btn {
+  text-transform: uppercase;
+}
+
 .button-sections .MuiButton-root:hover {
   background: var(--surface-muted);
   border-color: var(--accent);
@@ -211,10 +218,11 @@ h1 {
   opacity: 1;
 }
 
-@media (max-width: 560px) {
-  .button-sections {
-    padding: 16px;
-  }
+.app-shell[data-theme="dark"] .main-content .copy-clipboard-btn:disabled {
+  opacity: 0.55;
+  color: var(--text-muted);
+  border-color: var(--border);
+  background-color: var(--surface);
 }
 
 .main-content .MuiPaper-root.tmpl-card {
