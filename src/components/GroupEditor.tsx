@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Box,
   Button,
@@ -14,6 +14,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { extractTags } from "../utils/templateUtils";
 import type { ButtonGroup } from "../types";
 import { ChildEditor } from "./ChildEditor";
+import { InputModal } from "./InputModal";
 
 interface GroupEditorProps {
   group: ButtonGroup;
@@ -40,9 +41,13 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isInputOpen, setIsInputOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
   const [editLabel, setEditLabel] = useState(group.label);
   const [editTemplate, setEditTemplate] = useState(group.template);
+  const templateRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const cursorPosRef = useRef<number | null>(null);
 
   const {
     attributes,
@@ -81,168 +86,224 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
   const groupTags = extractTags(group.template);
 
   return (
-    <Paper ref={setNodeRef} className="tmpl-card" style={style} sx={{ overflow: "hidden" }}>
-      <Box
-        sx={{
-          bgcolor: "var(--surface)",
-          p: 2,
-          display: "flex",
-          flexDirection: "column",
-          gap: 1,
-          borderBottom: 1,
-          borderColor: "var(--border)",
-        }}
+    <>
+      <Paper
+        ref={setNodeRef}
+        className="tmpl-card"
+        style={style}
+        sx={{ overflow: "hidden" }}
       >
-        {isEditing ? (
-          <Stack spacing={2} sx={{ flex: 1 }}>
-            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-              Label
-            </Typography>
-            <TextField
-              fullWidth
-              value={editLabel}
-              onChange={(e) => setEditLabel(e.target.value)}
-              placeholder="Group Label"
-              size="small"
-            />
-            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-              Template
-            </Typography>
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              value={editTemplate}
-              onChange={(e) => setEditTemplate(e.target.value)}
-              placeholder="Template text e.g. Hello {name}"
-            />
-            <Stack direction="row" spacing={1}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="small"
-                onClick={handleSave}
-              >
-                Save
-              </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => {
-                  setEditLabel(group.label);
-                  setEditTemplate(group.template);
-                  setIsEditing(false);
-                }}
-              >
-                Cancel
-              </Button>
-            </Stack>
-          </Stack>
-        ) : (
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto",
-              gridTemplateRows: "auto auto",
-              columnGap: 1,
-              rowGap: 1,
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: "bold", cursor: "pointer" }}
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {group.label}
-            </Typography>
-            <Stack
-              direction="row"
-              spacing={1}
-              sx={{ alignItems: "center", justifyContent: "flex-end" }}
-            >
-              <IconButton
-                size="small"
-                onClick={() => setIsExpanded(!isExpanded)}
-                sx={{
-                  transform: isExpanded ? "rotate(90deg)" : "rotate(-90deg)",
-                  transition: "transform 0.3s",
-                }}
-              >
-                <Typography sx={{ fontSize: "1.5rem", lineHeight: 1 }}>
-                  ‹
-                </Typography>
-              </IconButton>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => setIsEditing(true)}
-              >
-                Edit
-              </Button>
-              <Button variant="outlined" size="small" onClick={deleteGroup}>
-                Delete
-              </Button>
-            </Stack>
-            <Typography
-              variant="caption"
-              sx={{
-                fontFamily: "monospace",
-                bgcolor: "var(--surface-muted)",
-                p: 1,
-                borderRadius: 1,
-                cursor: "pointer",
-              }}
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {group.template}
-            </Typography>
-            <IconButton
-              size="small"
-              {...attributes}
-              {...listeners}
-              sx={{ cursor: "grab", color: "text.secondary" }}
-            >
-              <DragHandleIcon />
-            </IconButton>
-          </Box>
-        )}
-      </Box>
-
-      {isExpanded && !isEditing && (
         <Box
           sx={{
+            bgcolor: "var(--surface)",
             p: 2,
-            bgcolor: "var(--surface-muted)",
             display: "flex",
             flexDirection: "column",
-            gap: 2,
+            gap: 1,
+            borderBottom: 1,
+            borderColor: "var(--border)",
           }}
         >
-          {group.options.map((child) => (
-            <ChildEditor
-              key={child.id}
-              child={child}
-              tags={groupTags}
-              onSave={(label, fills) => updateChild(child.id, label, fills)}
-              onDelete={() => deleteChild(child.id)}
-              confirmAction={confirmAction}
-            />
-          ))}
-          <Button
-            fullWidth
-            variant="outlined"
-            sx={{
-              borderStyle: "dashed",
-              py: 1.5,
-              color: "text.secondary",
-              "&:hover": { bgcolor: "action.hover", color: "text.primary" },
-            }}
-            onClick={addChild}
-          >
-            + Add Option
-          </Button>
+          {isEditing ? (
+            <Stack spacing={2} sx={{ flex: 1 }}>
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                Label
+              </Typography>
+              <TextField
+                fullWidth
+                value={editLabel}
+                onChange={(e) => setEditLabel(e.target.value)}
+                placeholder="Group Label"
+                size="small"
+              />
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                  Template
+                </Typography>
+                <Button onClick={() => setIsInputOpen(true)}>
+                  Insert Variable
+                </Button>
+              </Box>
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                value={editTemplate}
+                onChange={(e) => {
+                  setEditTemplate(e.target.value);
+                  cursorPosRef.current = e.target.selectionStart;
+                }}
+                onClick={(e) => {
+                  cursorPosRef.current = (e.target as HTMLInputElement | HTMLTextAreaElement).selectionStart;
+                }}
+                onKeyUp={(e) => {
+                  cursorPosRef.current = (e.target as HTMLInputElement | HTMLTextAreaElement).selectionStart;
+                }}
+                inputRef={(el: HTMLInputElement | HTMLTextAreaElement | null) => {
+                  templateRef.current = el;
+                }}
+                placeholder="Template text e.g. Hello {name}"
+              />
+              <Stack direction="row" spacing={1}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  onClick={handleSave}
+                >
+                  Save
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => {
+                    setEditLabel(group.label);
+                    setEditTemplate(group.template);
+                    setIsEditing(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </Stack>
+            </Stack>
+          ) : (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "1fr auto",
+                gridTemplateRows: "auto auto",
+                columnGap: 1,
+                rowGap: 1,
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: "bold", cursor: "pointer" }}
+                onClick={() => setIsExpanded(!isExpanded)}
+              >
+                {group.label}
+              </Typography>
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{ alignItems: "center", justifyContent: "flex-end" }}
+              >
+                <IconButton
+                  size="small"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  sx={{
+                    transform: isExpanded ? "rotate(90deg)" : "rotate(-90deg)",
+                    transition: "transform 0.3s",
+                  }}
+                >
+                  <Typography sx={{ fontSize: "1.5rem", lineHeight: 1 }}>
+                    ‹
+                  </Typography>
+                </IconButton>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => setIsEditing(true)}
+                >
+                  Edit
+                </Button>
+                <Button variant="outlined" size="small" onClick={deleteGroup}>
+                  Delete
+                </Button>
+              </Stack>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontFamily: "monospace",
+                  bgcolor: "var(--surface-muted)",
+                  p: 1,
+                  borderRadius: 1,
+                  cursor: "pointer",
+                }}
+                onClick={() => setIsExpanded(!isExpanded)}
+              >
+                {group.template}
+              </Typography>
+              <IconButton
+                size="small"
+                {...attributes}
+                {...listeners}
+                sx={{ cursor: "grab", color: "text.secondary" }}
+              >
+                <DragHandleIcon />
+              </IconButton>
+            </Box>
+          )}
         </Box>
-      )}
-    </Paper>
+
+        {isExpanded && !isEditing && (
+          <Box
+            sx={{
+              p: 2,
+              bgcolor: "var(--surface-muted)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+            }}
+          >
+            {group.options.map((child) => (
+              <ChildEditor
+                key={child.id}
+                child={child}
+                tags={groupTags}
+                onSave={(label, fills) => updateChild(child.id, label, fills)}
+                onDelete={() => deleteChild(child.id)}
+                confirmAction={confirmAction}
+              />
+            ))}
+            <Button
+              fullWidth
+              variant="outlined"
+              sx={{
+                borderStyle: "dashed",
+                py: 1.5,
+                color: "text.secondary",
+                "&:hover": { bgcolor: "action.hover", color: "text.primary" },
+              }}
+              onClick={addChild}
+            >
+              + Add Option
+            </Button>
+          </Box>
+        )}
+      </Paper>
+      <InputModal
+        isOpen={isInputOpen}
+        value={inputValue}
+        onChange={setInputValue}
+        onConfirm={() => {
+          if (!inputValue) return;
+          const insert = `{${inputValue}}`;
+          const pos = cursorPosRef.current ?? editTemplate.length;
+          const next =
+            editTemplate.slice(0, pos) + insert + editTemplate.slice(pos);
+          setEditTemplate(next);
+          setIsInputOpen(false);
+          setInputValue("");
+          requestAnimationFrame(() => {
+            const el = templateRef.current;
+            if (el) {
+              el.focus();
+              el.setSelectionRange(pos + insert.length, pos + insert.length);
+            }
+          });
+        }}
+        onCancel={() => {
+          setIsInputOpen(false);
+          setInputValue("");
+        }}
+      />
+    </>
   );
 };

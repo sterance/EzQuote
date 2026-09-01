@@ -225,6 +225,12 @@ h1 {
   background-color: var(--surface);
 }
 
+.app-shell[data-theme="dark"] .main-content .clear-all-btn:disabled {
+  opacity: 0.55;
+  color: var(--text-muted);
+  border-color: var(--border);
+}
+
 .main-content .MuiPaper-root.tmpl-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -298,4 +304,28 @@ h1 {
 .confirmation-modal .MuiButton-outlined:hover {
   background: var(--surface-muted);
   border-color: var(--accent);
+}
+
+.confirmation-modal .MuiOutlinedInput-root {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.confirmation-modal .MuiOutlinedInput-notchedOutline {
+  border-color: var(--border);
+}
+
+.confirmation-modal .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: var(--accent);
+}
+
+.confirmation-modal
+  .MuiOutlinedInput-root.Mui-focused
+  .MuiOutlinedInput-notchedOutline {
+  border-color: var(--accent);
+}
+
+.confirmation-modal .MuiOutlinedInput-input::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
 }

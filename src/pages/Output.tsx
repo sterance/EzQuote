@@ -109,8 +109,8 @@ export default function Output() {
 
   const hasDataToClear = useMemo(() => {
     return (
+      Object.values(enabledGroups).some(Boolean) ||
       Object.keys(selections).length > 0 ||
-      Object.keys(enabledGroups).length > 0 ||
       Object.keys(textFills).length > 0
     );
   }, [selections, enabledGroups, textFills]);
