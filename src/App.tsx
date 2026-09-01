@@ -28,7 +28,7 @@ function App() {
   return (
     <Box className="app-shell" data-theme={isDarkMode ? "dark" : "light"}>
       <Box component="nav" className="top-nav" aria-label="Main navigation">
-        <span className="brand-mark">App</span>
+        <span className="brand-mark">EzQuote</span>
         <Box className="nav-links">
           <NavLink to="/output">Output</NavLink>
           <NavLink to="/templates">Templates</NavLink>

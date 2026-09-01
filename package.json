@@ -1,11 +1,11 @@
 {
-  "name": "pool1",
+  "name": "EzQuote",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "main": "electron/main.cjs",
   "author": "Your Name",
-  "description": "Pool equipment repair canned-response builder",
+  "description": "Canned-response builder",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -43,8 +43,8 @@
     "vite": "^8.2.2"
   },
   "build": {
-    "appId": "com.pool1.app",
-    "productName": "Pool1",
+    "appId": "com.ezquote.app",
+    "productName": "EzQuote",
     "directories": {
       "output": "release"
     },

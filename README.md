@@ -1,4 +1,4 @@
-# Pool1
+# EzQuote
 
 Desktop application for building canned responses for pool equipment repair.
 
@@ -28,4 +28,4 @@ npm run dev
 npm run build:electron
 ```
 
-Output: `release/Pool1-<version>.exe`
+Output: `release/EzQuote-<version>.exe`
