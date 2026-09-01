@@ -36,6 +36,12 @@ jobs:
       - name: Bundle exe and sample data into one zip
         run: Compress-Archive -Path "release/*.exe","release/sample-templates.json" -DestinationPath "release/EzQuote-Windows.zip"
 
+      - name: Delete previous latest release
+        run: gh release delete latest --yes --cleanup-tag
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
