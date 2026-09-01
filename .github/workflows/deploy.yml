@@ -27,7 +27,7 @@ jobs:
 
       - name: Build Project
         run: |
-          npm ci --omit=optional
+          npm ci
           npm run build
 
       - name: Deploy to Cloudflare Pages
