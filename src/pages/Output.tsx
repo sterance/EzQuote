@@ -16,7 +16,7 @@ function fillTemplate(template: string, fills: Record<string, string>) {
   );
 }
 
-export default function Output() {
+export function Output() {
   const { groups } = useTemplateStore();
   const [selections, setSelections] = useState<Record<string, string>>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);

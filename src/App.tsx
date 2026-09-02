@@ -2,7 +2,9 @@ import "./App.css";
 import { Box, IconButton } from "@mui/material";
 import { useState } from "react";
 import { NavLink, Navigate, Route, Routes } from "react-router-dom";
-import Output from "./pages/Output";
+import { Output } from "./pages/Output";
+import { Help } from "./pages/Help";
+import { Settings } from "./pages/Settings";
 import { Templates } from "./pages/Templates";
 
 const DARK_MODE_KEY = "dark_mode";
@@ -11,7 +13,10 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     try {
       const saved = localStorage.getItem(DARK_MODE_KEY) === "true";
-      document.documentElement.setAttribute("data-theme", saved ? "dark" : "light");
+      document.documentElement.setAttribute(
+        "data-theme",
+        saved ? "dark" : "light",
+      );
       return saved;
     } catch {
       return false;
@@ -22,7 +27,10 @@ function App() {
     const next = !isDarkMode;
     setIsDarkMode(next);
     localStorage.setItem(DARK_MODE_KEY, String(next));
-    document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
+    document.documentElement.setAttribute(
+      "data-theme",
+      next ? "dark" : "light",
+    );
   };
 
   return (
@@ -32,6 +40,8 @@ function App() {
         <Box className="nav-links">
           <NavLink to="/output">Output</NavLink>
           <NavLink to="/templates">Templates</NavLink>
+          <NavLink to="/help">Help</NavLink>
+          <NavLink to="/settings">Settings</NavLink>
         </Box>
         <IconButton
           className="theme-toggle"
@@ -46,11 +56,13 @@ function App() {
       </Box>
 
       <Box component="main" className="main-content">
-<Routes>
-           <Route path="/output" element={<Output />} />
-           <Route path="/templates" element={<Templates />} />
-           <Route path="*" element={<Navigate to="/output" replace />} />
-         </Routes>
+        <Routes>
+          <Route path="/output" element={<Output />} />
+          <Route path="/templates" element={<Templates />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="*" element={<Navigate to="/output" replace />} />
+        </Routes>
       </Box>
     </Box>
   );
