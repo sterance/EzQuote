@@ -1,12 +1,11 @@
-export interface ChildOption {
+export interface TagFill {
   id: string;
-  label: string;
-  fills: Record<string, string>;
+  value: string;
 }
 
 export interface ButtonGroup {
   id: string;
   label: string;
   template: string;
-  options: ChildOption[];
+  fills: Record<string, TagFill[]>;
 }

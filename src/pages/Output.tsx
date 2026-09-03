@@ -146,17 +146,17 @@ export function Output({
   return (
     <>
       <Box className="button-sections" sx={{ position: "relative" }}>
-<Button
-           variant="outlined"
-           color="error"
-           size="small"
-           onClick={onToggleAdvancedMode}
-           className="advanced-btn"
-           startIcon={advancedMode ? <RocketLaunchIcon /> : <AdjustIcon />}
-           sx={{ position: "absolute", top: 8, left: 8, zIndex: 1 }}
-         >
-           {advancedMode ? "Advanced Mode" : "Simple Mode"}
-         </Button>
+        <Button
+          variant="outlined"
+          color="error"
+          size="small"
+          onClick={onToggleAdvancedMode}
+          className="advanced-btn"
+          startIcon={advancedMode ? <RocketLaunchIcon /> : <AdjustIcon />}
+          sx={{ position: "absolute", top: 8, left: 8, zIndex: 1 }}
+        >
+          {advancedMode ? "Advanced Mode" : "Simple Mode"}
+        </Button>
         <Button
           variant="outlined"
           color="error"
@@ -168,38 +168,46 @@ export function Output({
         >
           Clear All
         </Button>
-        {groups.map((group) =>
-          group.options.length === 0 ? (
-            <FillableGroup
-              key={group.id}
-              label={group.label}
-              template={group.template}
-              value={textFills[group.id] ?? {}}
-              enabled={Boolean(enabledGroups[group.id])}
-              onChange={(tag, value) => handleTextChange(group.id, tag, value)}
-              onToggleEnabled={(enabled) =>
-                handleToggleGroup(group.id, enabled)
-              }
-            />
-          ) : (
+        {groups.map((group) => {
+          const hasFills =
+            group.fills && Object.values(group.fills).some((l) => l.length > 0);
+          const hasTags = extractTags(group.template).length > 0;
+          const useFreeText = !hasFills && hasTags;
+
+          if (useFreeText) {
+            return (
+              <FillableGroup
+                key={group.id}
+                label={group.label}
+                template={group.template}
+                value={textFills[group.id] ?? {}}
+                enabled={Boolean(enabledGroups[group.id])}
+                onChange={(tag, value) => handleTextChange(group.id, tag, value)}
+                onToggleEnabled={(enabled) =>
+                  handleToggleGroup(group.id, enabled)
+                }
+              />
+            );
+          }
+          return (
             <OutputGroup
               key={group.id}
               label={group.label}
-              options={group.options.map(({ id, label, fills }) => ({ id: id as string, label: label as string, fills }))}
+              fills={group.fills || {}}
               template={group.template}
               enabled={Boolean(enabledGroups[group.id])}
-              onToggleEnabled={(enabled: boolean) =>
+              onToggleEnabled={(enabled) =>
                 handleToggleGroup(group.id, enabled)
               }
-              onChange={(fills: Record<string, string>) => {
+              onChange={(fills) => {
                 setTextFills((current) => ({
                   ...current,
                   [group.id]: fills,
                 }));
               }}
             />
-          ),
-        )}
+          );
+        })}
       </Box>
 
       <Textbox label="Output" placeholder="" value={output} />

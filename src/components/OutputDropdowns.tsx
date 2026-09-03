@@ -5,22 +5,17 @@ import Select from "@mui/material/Select";
 import { useMemo, useState } from "react";
 import { extractTags } from "../utils/templateUtils";
 import { Typography } from "@mui/material";
-
-interface Option {
-  id: string;
-  label: string;
-  fills: Record<string, string>;
-}
+import type { TagFill } from "../types";
 
 interface OutputDropdownsProps {
-  options: Option[];
+  fills: Record<string, TagFill[]>;
   template: string;
   enabled: boolean;
   onChange: (fills: Record<string, string>) => void;
 }
 
 export default function OutputDropdowns({
-  options,
+  fills,
   template,
   enabled,
   onChange,
@@ -30,15 +25,10 @@ export default function OutputDropdowns({
   const candidates = useMemo(() => {
     const result: Record<string, string[]> = {};
     for (const tag of tags) {
-      const seen = new Set<string>();
-      for (const opt of options) {
-        const val = opt.fills[tag];
-        if (val) seen.add(val);
-      }
-      result[tag] = [...seen];
+      result[tag] = (fills[tag] ?? []).map((f) => f.value);
     }
     return result;
-  }, [options, tags]);
+  }, [fills, tags]);
 
   const [selections, setSelections] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};

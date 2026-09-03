@@ -1,14 +1,3 @@
-export interface ButtonOption {
-  id: string;
-  label: string;
-  fills: Record<string, string>;
-}
+import type { ButtonGroup } from "../types";
 
-export interface ButtonGroupConfig {
-  id: string;
-  label: string;
-  template: string;
-  options: ButtonOption[];
-}
-
-export const buttonGroups: ButtonGroupConfig[] = [];
+export const buttonGroups: ButtonGroup[] = [];

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import type { ButtonGroup, ChildOption } from "../types";
+import type { ButtonGroup, TagFill } from "../types";
 import {
   extractTags,
-  syncChildFills,
+  syncGroupFills,
   generateId,
 } from "../utils/templateUtils";
 import { buttonGroups as defaultButtonGroups } from "../data/buttonGroups";
@@ -19,12 +19,7 @@ export const useTemplateStore = () => {
         console.error("Failed to parse local storage data.");
       }
     }
-    return defaultButtonGroups.map((group) => ({
-      id: group.id,
-      label: group.label,
-      template: group.template,
-      options: group.options as ChildOption[],
-    }));
+    return defaultButtonGroups;
   });
 
   useEffect(() => {
@@ -41,17 +36,14 @@ export const useTemplateStore = () => {
         if (group.id !== groupId) return group;
 
         const newTags = extractTags(newTemplate);
-        const updatedOptions = group.options.map((btn) => ({
-          ...btn,
-          fills: syncChildFills(btn.fills || {}, newTags),
-        }));
+        const updatedFills = syncGroupFills(group.fills || {}, newTags);
 
         return {
           ...group,
           id: generateId(newLabel),
           label: newLabel,
           template: newTemplate,
-          options: updatedOptions,
+          fills: updatedFills,
         };
       }),
     );
@@ -75,61 +67,19 @@ export const useTemplateStore = () => {
       id: generateId("New Group"),
       label: "New Group",
       template: "",
-      options: [],
+      fills: {},
     };
     setGroups((prev) => [...prev, newGroup]);
   };
 
-  const updateChild = (
+  const updateGroupFills = (
     groupId: string,
-    childId: string,
-    newLabel: string,
-    newFills: Record<string, string>,
+    fills: Record<string, TagFill[]>,
   ) => {
     setGroups((prev) =>
-      prev.map((group) => {
-        if (group.id !== groupId) return group;
-        return {
-          ...group,
-          options: group.options.map((btn) =>
-            btn.id === childId
-              ? {
-                  ...btn,
-                  id: generateId(newLabel),
-                  label: newLabel,
-                  fills: newFills,
-                }
-              : btn,
-          ),
-        };
-      }),
-    );
-  };
-
-  const deleteChild = (groupId: string, childId: string) => {
-    setGroups((prev) =>
-      prev.map((group) => {
-        if (group.id !== groupId) return group;
-        return {
-          ...group,
-          options: group.options.filter((b) => b.id !== childId),
-        };
-      }),
-    );
-  };
-
-  const addChild = (groupId: string) => {
-    setGroups((prev) =>
-      prev.map((group) => {
-        if (group.id !== groupId) return group;
-        const tags = extractTags(group.template);
-        const newChild: ChildOption = {
-          id: generateId("New Option"),
-          label: "New Option",
-          fills: syncChildFills({}, tags),
-        };
-        return { ...group, options: [...group.options, newChild] };
-      }),
+      prev.map((group) =>
+        group.id === groupId ? { ...group, fills } : group,
+      ),
     );
   };
 
@@ -140,11 +90,7 @@ export const useTemplateStore = () => {
         Array.isArray(parsed) &&
         parsed.every((g) => g.id && g.label && typeof g.template === "string")
       ) {
-        const transformed = parsed.map((group) => ({
-          ...group,
-          options: group.options || [],
-        }));
-        setGroups(transformed);
+        setGroups(parsed);
         return true;
       }
       return false;
@@ -155,14 +101,7 @@ export const useTemplateStore = () => {
 
   const clearAll = () => {
     localStorage.removeItem(STORAGE_KEY);
-    setGroups(
-      defaultButtonGroups.map((group) => ({
-        id: group.id,
-        label: group.label,
-        template: group.template,
-        options: group.options as ChildOption[],
-      })),
-    );
+    setGroups(defaultButtonGroups);
   };
 
   return {
@@ -170,9 +109,7 @@ export const useTemplateStore = () => {
     updateGroup,
     deleteGroup,
     addGroup,
-    updateChild,
-    deleteChild,
-    addChild,
+    updateGroupFills,
     importData,
     reorderGroups,
     clearAll,
