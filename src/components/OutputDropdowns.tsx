@@ -71,7 +71,10 @@ export default function OutputDropdowns({
 
         return (
           <FormControl key={tag} size="small" sx={{ flex: 1, minWidth: 120 }}>
-            <Typography variant="h6" sx={{ textAlign: "center" }}>
+            <Typography
+              variant="h6"
+              sx={{ textAlign: "center", textTransform: "capitalize" }}
+            >
               {tag}
             </Typography>
             <Select
