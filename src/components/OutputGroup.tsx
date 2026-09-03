@@ -1,31 +1,25 @@
-import Button from "@mui/material/Button";
-import ButtonGroup from "@mui/material/ButtonGroup";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import { useId } from "react";
+import OutputButtons from "./OutputButtons";
 
-export interface ButtonOption {
-  id: string;
+interface OutputGroupProps {
   label: string;
-}
-
-interface ButtonsProps {
-  label: string;
-  options: ButtonOption[];
+  options: { id: string; label: string }[];
   selectedId?: string;
   onSelect: (id: string) => void;
   enabled: boolean;
   onToggleEnabled: (enabled: boolean) => void;
 }
 
-export default function Buttons({
+export default function OutputGroup({
   label,
   options,
   selectedId,
   onSelect,
   enabled,
   onToggleEnabled,
-}: ButtonsProps) {
+}: OutputGroupProps) {
   const buttonsId = useId();
   const labelId = `${buttonsId}-label`;
   const toggleId = `${buttonsId}-toggle`;
@@ -67,33 +61,14 @@ export default function Buttons({
           {label}
         </Box>
       </Box>
-      <ButtonGroup
-        id={buttonsId}
-        variant="outlined"
-        aria-labelledby={labelId}
-        sx={{
-          opacity: enabled ? 1 : 0.55,
-          transition: "opacity 150ms ease",
-          gap: "1px",
-        }}
-      >
-        {options.map((option) => {
-          const buttonId = `${buttonsId}-button-${option.id}`;
-          const isSelected = option.id === selectedId;
-
-          return (
-            <Button
-              id={buttonId}
-              key={buttonId}
-              variant={isSelected ? "contained" : "outlined"}
-              aria-pressed={isSelected}
-              onClick={() => onSelect(option.id)}
-            >
-              {option.label}
-            </Button>
-          );
-        })}
-      </ButtonGroup>
+      <OutputButtons
+        options={options}
+        selectedId={selectedId}
+        onSelect={onSelect}
+        enabled={enabled}
+        labelId={labelId}
+        buttonsId={buttonsId}
+      />
     </Box>
   );
 }

@@ -1,7 +1,7 @@
 import { Alert, Box, Button, Snackbar } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useTemplateStore } from "../hooks/useTemplateStore";
-import Buttons from "../components/Buttons";
+import OutputGroup from "../components/OutputGroup";
 import FillableGroup from "../components/FillableGroup";
 import Textbox from "../components/Textbox";
 import { extractTags } from "../utils/templateUtils";
@@ -206,14 +206,14 @@ export function Output({
               }
             />
           ) : (
-            <Buttons
+            <OutputGroup
               key={group.id}
               label={group.label}
-              options={group.options.map(({ id, label }) => ({ id, label }))}
+              options={group.options.map(({ id, label }) => ({ id: id as string, label: label as string }))}
               selectedId={selections[group.id]}
-              onSelect={(optionId) => handleSelect(group.id, optionId)}
+              onSelect={(optionId: string) => handleSelect(group.id, optionId)}
               enabled={Boolean(enabledGroups[group.id])}
-              onToggleEnabled={(enabled) =>
+              onToggleEnabled={(enabled: boolean) =>
                 handleToggleGroup(group.id, enabled)
               }
             />
