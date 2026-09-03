@@ -6,6 +6,8 @@ import FillableGroup from "../components/FillableGroup";
 import Textbox from "../components/Textbox";
 import { extractTags } from "../utils/templateUtils";
 import { ConfirmationModal } from "../components/ConfirmationModal";
+import AdjustIcon from "@mui/icons-material/Adjust";
+import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 
 const STORAGE_KEY = "output_data";
 
@@ -16,7 +18,13 @@ function fillTemplate(template: string, fills: Record<string, string>) {
   );
 }
 
-export function Output() {
+export function Output({
+  advancedMode,
+  onToggleAdvancedMode,
+}: {
+  advancedMode: boolean;
+  onToggleAdvancedMode: () => void;
+}) {
   const { groups } = useTemplateStore();
   const [selections, setSelections] = useState<Record<string, string>>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -162,6 +170,17 @@ export function Output() {
   return (
     <>
       <Box className="button-sections" sx={{ position: "relative" }}>
+<Button
+           variant="outlined"
+           color="error"
+           size="small"
+           onClick={onToggleAdvancedMode}
+           className="advanced-btn"
+           startIcon={advancedMode ? <RocketLaunchIcon /> : <AdjustIcon />}
+           sx={{ position: "absolute", top: 8, left: 8, zIndex: 1 }}
+         >
+           {advancedMode ? "Advanced Mode" : "Simple Mode"}
+         </Button>
         <Button
           variant="outlined"
           color="error"

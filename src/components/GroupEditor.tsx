@@ -46,7 +46,9 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
 
   const [editLabel, setEditLabel] = useState(group.label);
   const [editTemplate, setEditTemplate] = useState(group.template);
-  const templateRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const templateRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(
+    null,
+  );
   const cursorPosRef = useRef<number | null>(null);
 
   const {
@@ -126,6 +128,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
                 <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                   Template
                 </Typography>
+                <Typography>[text explaining how templates work]</Typography>
                 <Button onClick={() => setIsInputOpen(true)}>
                   Insert Variable
                 </Button>
@@ -140,12 +143,18 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
                   cursorPosRef.current = e.target.selectionStart;
                 }}
                 onClick={(e) => {
-                  cursorPosRef.current = (e.target as HTMLInputElement | HTMLTextAreaElement).selectionStart;
+                  cursorPosRef.current = (
+                    e.target as HTMLInputElement | HTMLTextAreaElement
+                  ).selectionStart;
                 }}
                 onKeyUp={(e) => {
-                  cursorPosRef.current = (e.target as HTMLInputElement | HTMLTextAreaElement).selectionStart;
+                  cursorPosRef.current = (
+                    e.target as HTMLInputElement | HTMLTextAreaElement
+                  ).selectionStart;
                 }}
-                inputRef={(el: HTMLInputElement | HTMLTextAreaElement | null) => {
+                inputRef={(
+                  el: HTMLInputElement | HTMLTextAreaElement | null,
+                ) => {
                   templateRef.current = el;
                 }}
                 placeholder="Template text e.g. Hello {name}"
@@ -252,6 +261,9 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
               gap: 2,
             }}
           >
+            <Typography>
+              [text explaining how to use the options section]
+            </Typography>
             {group.options.map((child) => (
               <ChildEditor
                 key={child.id}
@@ -262,6 +274,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
                 confirmAction={confirmAction}
               />
             ))}
+
             <Button
               fullWidth
               variant="outlined"

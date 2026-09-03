@@ -12,22 +12,24 @@
   {
     "id": "cable-damage",
     "label": "Broken Cable",
-    "template": "Your cable has {condition}, and this will require {requirement}.",
+    "template": "Your cable has {condition}, and this will require {requirement} due to {detail}.",
     "options": [
       {
         "id": "flooded",
         "label": "Flooded",
-        "fills": {
-          "condition": "flooded",
-          "requirement": "drying out and inspection before it can be safely reused"
-        }
+"fills": {
+            "condition": "flooded",
+            "requirement": "drying out and inspection before it can be safely reused",
+            "detail": "due to a water leak in the main supply line"
+          }
       },
       {
         "id": "cut",
         "label": "Cut",
         "fills": {
           "condition": "been cut",
-          "requirement": "a splice or full replacement of the affected section"
+          "requirement": "a splice or full replacement of the affected section",
+          "detail": "caused by mechanical stress or accidental damage"
         }
       },
       {
@@ -35,7 +37,8 @@
         "label": "Broken pins",
         "fills": {
           "condition": "broken pins",
-          "requirement": "replacement of the connector"
+          "requirement": "replacement of the connector",
+          "detail": "due to frequent connection and disconnection cycles"
         }
       },
       {
@@ -43,7 +46,8 @@
         "label": "Corroded",
         "fills": {
           "condition": "visible corrosion on the wiring",
-          "requirement": "cleaning and inspection, with replacement if the corrosion has compromised the conductors"
+          "requirement": "cleaning and inspection, with replacement if the corrosion has compromised the conductors",
+          "detail": "due to exposure to moisture or harsh environmental conditions"
         }
       },
       {
@@ -51,7 +55,8 @@
         "label": "Rodent Damage",
         "fills": {
           "condition": "chew marks consistent with rodent damage",
-          "requirement": "replacement of the damaged section and inspection of nearby wiring"
+          "requirement": "replacement of the damaged section and inspection of nearby wiring",
+          "detail": "due to pests accessing the wiring in storage areas"
         }
       }
     ]

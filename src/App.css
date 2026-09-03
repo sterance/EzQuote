@@ -167,6 +167,9 @@ h1 {
 .button-sections .MuiButton-root.clear-all-btn {
   text-transform: uppercase;
 }
+.button-sections .MuiButton-root.advanced-btn {
+  text-transform: uppercase;
+}
 
 .button-sections .MuiButton-root:hover {
   background: var(--surface-muted);

@@ -8,6 +8,7 @@ import { Settings } from "./pages/Settings";
 import { Templates } from "./pages/Templates";
 
 const DARK_MODE_KEY = "dark_mode";
+const ADVANCED_MODE_KEY = "advanced_mode";
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
@@ -23,6 +24,14 @@ function App() {
     }
   });
 
+  const [advancedMode, setAdvancedMode] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(ADVANCED_MODE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
   const toggleTheme = () => {
     const next = !isDarkMode;
     setIsDarkMode(next);
@@ -31,6 +40,12 @@ function App() {
       "data-theme",
       next ? "dark" : "light",
     );
+  };
+
+  const toggleAdvancedMode = () => {
+    const next = !advancedMode;
+    setAdvancedMode(next);
+    localStorage.setItem(ADVANCED_MODE_KEY, String(next));
   };
 
   return (
@@ -55,15 +70,15 @@ function App() {
         </IconButton>
       </Box>
 
-      <Box component="main" className="main-content">
-        <Routes>
-          <Route path="/output" element={<Output />} />
-          <Route path="/templates" element={<Templates />} />
-          <Route path="/help" element={<Help />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="*" element={<Navigate to="/output" replace />} />
-        </Routes>
-      </Box>
+<Box component="main" className="main-content">
+         <Routes>
+           <Route path="/output" element={<Output advancedMode={advancedMode} onToggleAdvancedMode={toggleAdvancedMode} />} />
+           <Route path="/templates" element={<Templates />} />
+           <Route path="/help" element={<Help />} />
+           <Route path="/settings" element={<Settings />} />
+           <Route path="*" element={<Navigate to="/output" replace />} />
+         </Routes>
+       </Box>
     </Box>
   );
 }
