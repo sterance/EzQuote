@@ -1,28 +1,34 @@
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import { useId } from "react";
-import OutputButtons from "./OutputButtons";
+import OutputDropdowns from "./OutputDropdowns";
+
+interface Option {
+  id: string;
+  label: string;
+  fills: Record<string, string>;
+}
 
 interface OutputGroupProps {
   label: string;
-  options: { id: string; label: string }[];
-  selectedId?: string;
-  onSelect: (id: string) => void;
+  options: Option[];
+  template: string;
   enabled: boolean;
   onToggleEnabled: (enabled: boolean) => void;
+  onChange: (fills: Record<string, string>) => void;
 }
 
 export default function OutputGroup({
   label,
   options,
-  selectedId,
-  onSelect,
+  template,
   enabled,
   onToggleEnabled,
+  onChange,
 }: OutputGroupProps) {
-  const buttonsId = useId();
-  const labelId = `${buttonsId}-label`;
-  const toggleId = `${buttonsId}-toggle`;
+  const groupId = useId();
+  const labelId = `${groupId}-label`;
+  const toggleId = `${groupId}-toggle`;
 
   return (
     <Box
@@ -61,13 +67,11 @@ export default function OutputGroup({
           {label}
         </Box>
       </Box>
-      <OutputButtons
+      <OutputDropdowns
         options={options}
-        selectedId={selectedId}
-        onSelect={onSelect}
+        template={template}
         enabled={enabled}
-        labelId={labelId}
-        buttonsId={buttonsId}
+        onChange={onChange}
       />
     </Box>
   );

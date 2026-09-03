@@ -26,18 +26,6 @@ export function Output({
   onToggleAdvancedMode: () => void;
 }) {
   const { groups } = useTemplateStore();
-  const [selections, setSelections] = useState<Record<string, string>>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return parsed.selections ?? {};
-      } catch {
-        console.error("Failed to parse local storage data.");
-      }
-    }
-    return {};
-  });
   const [enabledGroups, setEnabledGroups] = useState<Record<string, boolean>>(
     () => {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -70,13 +58,9 @@ export function Output({
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ selections, enabledGroups, textFills }),
+      JSON.stringify({ enabledGroups, textFills }),
     );
-  }, [selections, enabledGroups, textFills]);
-
-  const handleSelect = (groupId: string, optionId: string) => {
-    setSelections((current) => ({ ...current, [groupId]: optionId }));
-  };
+  }, [enabledGroups, textFills]);
 
   const handleToggleGroup = (groupId: string, enabled: boolean) => {
     setEnabledGroups((current) => ({ ...current, [groupId]: enabled }));
@@ -94,34 +78,27 @@ export function Output({
       .map((group) => {
         if (!enabledGroups[group.id]) return null;
 
-        if (group.options.length === 0) {
-          const tags = extractTags(group.template);
-          if (tags.length === 0) {
-            return group.template;
-          }
-          const fills: Record<string, string> = {};
-          const groupFills = textFills[group.id] ?? {};
-          for (const tag of tags) {
-            fills[tag] = groupFills[tag] ?? "";
-          }
-          return fillTemplate(group.template, fills);
+        const tags = extractTags(group.template);
+        if (tags.length === 0) {
+          return group.template;
         }
-
-        const selectedOptionId = selections[group.id];
-        const option = group.options.find((o) => o.id === selectedOptionId);
-        return option ? fillTemplate(group.template, option.fills) : null;
+        const fills: Record<string, string> = {};
+        const groupFills = textFills[group.id] ?? {};
+        for (const tag of tags) {
+          fills[tag] = groupFills[tag] ?? "";
+        }
+        return fillTemplate(group.template, fills);
       })
       .filter((line): line is string => Boolean(line))
       .join("\n\n");
-  }, [selections, enabledGroups, groups, textFills]);
+  }, [enabledGroups, groups, textFills]);
 
   const hasDataToClear = useMemo(() => {
     return (
       Object.values(enabledGroups).some(Boolean) ||
-      Object.keys(selections).length > 0 ||
       Object.keys(textFills).length > 0
     );
-  }, [selections, enabledGroups, textFills]);
+  }, [enabledGroups, textFills]);
 
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -162,7 +139,6 @@ export function Output({
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
 
   const handleClearAll = () => {
-    setSelections({});
     setEnabledGroups({});
     setTextFills({});
   };
@@ -209,13 +185,18 @@ export function Output({
             <OutputGroup
               key={group.id}
               label={group.label}
-              options={group.options.map(({ id, label }) => ({ id: id as string, label: label as string }))}
-              selectedId={selections[group.id]}
-              onSelect={(optionId: string) => handleSelect(group.id, optionId)}
+              options={group.options.map(({ id, label, fills }) => ({ id: id as string, label: label as string, fills }))}
+              template={group.template}
               enabled={Boolean(enabledGroups[group.id])}
               onToggleEnabled={(enabled: boolean) =>
                 handleToggleGroup(group.id, enabled)
               }
+              onChange={(fills: Record<string, string>) => {
+                setTextFills((current) => ({
+                  ...current,
+                  [group.id]: fills,
+                }));
+              }}
             />
           ),
         )}
