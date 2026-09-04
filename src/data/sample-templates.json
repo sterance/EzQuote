@@ -15,25 +15,25 @@
     "template": "Your cable has {condition}, and this will require {requirement} due to {detail}.",
     "fills": {
       "condition": [
-        { "id": "flooded", "value": "flooded" },
-        { "id": "cut", "value": "been cut" },
-        { "id": "broken-pins", "value": "broken pins" },
-        { "id": "corroded", "value": "visible corrosion on the wiring" },
-        { "id": "rodent-damage", "value": "chew marks consistent with rodent damage" }
+        "flooded",
+        "been cut",
+        "broken pins",
+        "visible corrosion on the wiring",
+        "chew marks consistent with rodent damage"
       ],
       "requirement": [
-        { "id": "flooded", "value": "drying out and inspection before it can be safely reused" },
-        { "id": "cut", "value": "a splice or full replacement of the affected section" },
-        { "id": "broken-pins", "value": "replacement of the connector" },
-        { "id": "corroded", "value": "cleaning and inspection, with replacement if the corrosion has compromised the conductors" },
-        { "id": "rodent-damage", "value": "replacement of the damaged section and inspection of nearby wiring" }
+        "drying out and inspection before it can be safely reused",
+        "a splice or full replacement of the affected section",
+        "replacement of the connector",
+        "cleaning and inspection, with replacement if the corrosion has compromised the conductors",
+        "replacement of the damaged section and inspection of nearby wiring"
       ],
       "detail": [
-        { "id": "flooded", "value": "due to a water leak in the main supply line" },
-        { "id": "cut", "value": "caused by mechanical stress or accidental damage" },
-        { "id": "broken-pins", "value": "due to frequent connection and disconnection cycles" },
-        { "id": "corroded", "value": "due to exposure to moisture or harsh environmental conditions" },
-        { "id": "rodent-damage", "value": "due to pests accessing the wiring in storage areas" }
+        "due to a water leak in the main supply line",
+        "caused by mechanical stress or accidental damage",
+        "due to frequent connection and disconnection cycles",
+        "due to exposure to moisture or harsh environmental conditions",
+        "due to pests accessing the wiring in storage areas"
       ]
     }
   },
@@ -43,22 +43,22 @@
     "template": "Your pool robot has {condition}, and this will require {requirement}.",
     "fills": {
       "condition": [
-        { "id": "not-charging", "value": "not holding a charge" },
-        { "id": "tracks-slipping", "value": "slipping tracks" },
-        { "id": "impeller-jam", "value": "a jammed impeller" },
-        { "id": "error-code", "value": "displayed an error code" },
-        { "id": "not-turning-on", "value": "not powering on at all" },
-        { "id": "leaving-debris", "value": "leaving debris behind on the pool floor or walls" },
-        { "id": "stuck-on-steps", "value": "getting stuck on steps or in corners" }
+        "not holding a charge",
+        "slipping tracks",
+        "a jammed impeller",
+        "displayed an error code",
+        "not powering on at all",
+        "leaving debris behind on the pool floor or walls",
+        "getting stuck on steps or in corners"
       ],
       "requirement": [
-        { "id": "not-charging", "value": "battery testing and likely replacement" },
-        { "id": "tracks-slipping", "value": "track and drive belt inspection or replacement" },
-        { "id": "impeller-jam", "value": "clearing debris and inspecting the impeller for damage" },
-        { "id": "error-code", "value": "diagnostic testing to identify the specific fault" },
-        { "id": "not-turning-on", "value": "checking the power supply, cable, and internal connections" },
-        { "id": "leaving-debris", "value": "inspecting the brushes, filter bag, and suction pathway" },
-        { "id": "stuck-on-steps", "value": "checking the navigation sensors and drive tracks" }
+        "battery testing and likely replacement",
+        "track and drive belt inspection or replacement",
+        "clearing debris and inspecting the impeller for damage",
+        "diagnostic testing to identify the specific fault",
+        "checking the power supply, cable, and internal connections",
+        "inspecting the brushes, filter bag, and suction pathway",
+        "checking the navigation sensors and drive tracks"
       ]
     }
   },
@@ -68,18 +68,18 @@
     "template": "Your pool pump has {condition}, and this will require {requirement}.",
     "fills": {
       "condition": [
-        { "id": "bearing-noise", "value": "a worn or damaged bearing causing a grinding noise" },
-        { "id": "seal-leak", "value": "a failed shaft seal that is leaking" },
-        { "id": "overheating", "value": "signs of overheating" },
-        { "id": "no-suction", "value": "lost suction, likely due to an air leak or clog" },
-        { "id": "tripped-breaker", "value": "repeatedly tripped the circuit breaker" }
+        "a worn or damaged bearing causing a grinding noise",
+        "a failed shaft seal that is leaking",
+        "signs of overheating",
+        "lost suction, likely due to an air leak or clog",
+        "repeatedly tripped the circuit breaker"
       ],
       "requirement": [
-        { "id": "bearing-noise", "value": "bearing replacement and a motor inspection" },
-        { "id": "seal-leak", "value": "seal replacement" },
-        { "id": "overheating", "value": "checking for restricted flow and inspecting the motor windings" },
-        { "id": "no-suction", "value": "inspecting the intake line, o-rings, and impeller" },
-        { "id": "tripped-breaker", "value": "electrical testing of the motor and wiring before it can be safely restarted" }
+        "bearing replacement and a motor inspection",
+        "seal replacement",
+        "checking for restricted flow and inspecting the motor windings",
+        "inspecting the intake line, o-rings, and impeller",
+        "electrical testing of the motor and wiring before it can be safely restarted"
       ]
     }
   },
@@ -89,16 +89,16 @@
     "template": "Your filter cartridge has {condition}, and this will require {requirement}.",
     "fills": {
       "condition": [
-        { "id": "torn", "value": "a torn filter element" },
-        { "id": "clogged", "value": "become heavily clogged with debris" },
-        { "id": "missing", "value": "arrived without a filter cartridge installed" },
-        { "id": "wrong-size", "value": "an incorrectly sized cartridge installed" }
+        "a torn filter element",
+        "become heavily clogged with debris",
+        "arrived without a filter cartridge installed",
+        "an incorrectly sized cartridge installed"
       ],
       "requirement": [
-        { "id": "torn", "value": "a full cartridge replacement" },
-        { "id": "clogged", "value": "a deep cleaning, or a replacement depending on its condition" },
-        { "id": "missing", "value": "a replacement cartridge to be sized and ordered" },
-        { "id": "wrong-size", "value": "swapping it for the correct size to restore proper filtration" }
+        "a full cartridge replacement",
+        "a deep cleaning, or a replacement depending on its condition",
+        "a replacement cartridge to be sized and ordered",
+        "swapping it for the correct size to restore proper filtration"
       ]
     }
   },
@@ -108,16 +108,16 @@
     "template": "Your remote control has {condition}, and this will require {requirement}.",
     "fills": {
       "condition": [
-        { "id": "unresponsive", "value": "become unresponsive to button presses" },
-        { "id": "cracked-screen", "value": "a cracked display screen" },
-        { "id": "water-damage", "value": "visible signs of water damage" },
-        { "id": "dead-battery", "value": "a battery that will no longer hold a charge" }
+        "become unresponsive to button presses",
+        "a cracked display screen",
+        "visible signs of water damage",
+        "a battery that will no longer hold a charge"
       ],
       "requirement": [
-        { "id": "unresponsive", "value": "testing of the internal circuitry and buttons" },
-        { "id": "cracked-screen", "value": "screen replacement" },
-        { "id": "water-damage", "value": "a full internal inspection, with replacement likely necessary" },
-        { "id": "dead-battery", "value": "battery replacement" }
+        "testing of the internal circuitry and buttons",
+        "screen replacement",
+        "a full internal inspection, with replacement likely necessary",
+        "battery replacement"
       ]
     }
   },
@@ -127,16 +127,16 @@
     "template": "Your power supply unit has {condition}, and this will require {requirement}.",
     "fills": {
       "condition": [
-        { "id": "no-power", "value": "no output power at all" },
-        { "id": "tripped-gfci", "value": "been tripping the GFCI outlet repeatedly" },
-        { "id": "frayed-cord", "value": "a frayed or damaged power cord" },
-        { "id": "blown-fuse", "value": "a blown internal fuse" }
+        "no output power at all",
+        "been tripping the GFCI outlet repeatedly",
+        "a frayed or damaged power cord",
+        "a blown internal fuse"
       ],
       "requirement": [
-        { "id": "no-power", "value": "testing of the transformer and internal fuses" },
-        { "id": "tripped-gfci", "value": "isolating whether the fault lies in the unit or the household wiring" },
-        { "id": "frayed-cord", "value": "cord replacement before it can be used safely" },
-        { "id": "blown-fuse", "value": "fuse replacement and a check for the underlying cause" }
+        "testing of the transformer and internal fuses",
+        "isolating whether the fault lies in the unit or the household wiring",
+        "cord replacement before it can be used safely",
+        "fuse replacement and a check for the underlying cause"
       ]
     }
   },
@@ -146,16 +146,16 @@
     "template": "Your brush/scrubber assembly has {condition}, and this will require {requirement}.",
     "fills": {
       "condition": [
-        { "id": "worn-out", "value": "worn down bristles that are no longer scrubbing effectively" },
-        { "id": "torn", "value": "a torn or split scrubber pad" },
-        { "id": "jammed", "value": "become jammed and unable to rotate" },
-        { "id": "missing", "value": "arrived missing one or more brushes" }
+        "worn down bristles that are no longer scrubbing effectively",
+        "a torn or split scrubber pad",
+        "become jammed and unable to rotate",
+        "arrived missing one or more brushes"
       ],
       "requirement": [
-        { "id": "worn-out", "value": "brush replacement" },
-        { "id": "torn", "value": "pad replacement" },
-        { "id": "jammed", "value": "clearing debris and inspecting the drive mechanism" },
-        { "id": "missing", "value": "ordering and fitting the missing parts" }
+        "brush replacement",
+        "pad replacement",
+        "clearing debris and inspecting the drive mechanism",
+        "ordering and fitting the missing parts"
       ]
     }
   },
@@ -165,14 +165,14 @@
     "template": "Your float/buoy has {condition}, and this will require {requirement}.",
     "fills": {
       "condition": [
-        { "id": "cracked", "value": "visible cracks in the housing" },
-        { "id": "waterlogged", "value": "taken on water and become waterlogged" },
-        { "id": "deflated", "value": "lost its buoyancy" }
+        "visible cracks in the housing",
+        "taken on water and become waterlogged",
+        "lost its buoyancy"
       ],
       "requirement": [
-        { "id": "cracked", "value": "full replacement" },
-        { "id": "waterlogged", "value": "drying out and a buoyancy test before it can be reused" },
-        { "id": "deflated", "value": "replacement, as this component cannot be repaired" }
+        "full replacement",
+        "drying out and a buoyancy test before it can be reused",
+        "replacement, as this component cannot be repaired"
       ]
     }
   },
@@ -182,16 +182,16 @@
     "template": "Your unit is currently {condition}, which means {requirement}.",
     "fills": {
       "condition": [
-        { "id": "in-warranty", "value": "within its manufacturer's warranty period" },
-        { "id": "out-of-warranty", "value": "outside of its manufacturer's warranty period" },
-        { "id": "recently-expired", "value": "just outside its warranty period" },
-        { "id": "extended-warranty-available", "value": "eligible for an extended warranty plan" }
+        "within its manufacturer's warranty period",
+        "outside of its manufacturer's warranty period",
+        "just outside its warranty period",
+        "eligible for an extended warranty plan"
       ],
       "requirement": [
-        { "id": "in-warranty", "value": "this repair should be covered at no cost to you, pending manufacturer approval" },
-        { "id": "out-of-warranty", "value": "the cost of parts and labor will apply" },
-        { "id": "recently-expired", "value": "we'd recommend reaching out to the manufacturer directly, as they may still offer goodwill support" },
-        { "id": "extended-warranty-available", "value": "we can walk you through the options if you're interested" }
+        "this repair should be covered at no cost to you, pending manufacturer approval",
+        "the cost of parts and labor will apply",
+        "we'd recommend reaching out to the manufacturer directly, as they may still offer goodwill support",
+        "we can walk you through the options if you're interested"
       ]
     }
   },
@@ -201,16 +201,16 @@
     "template": "Your equipment has {condition}, and unfortunately {requirement}.",
     "fills": {
       "condition": [
-        { "id": "cracked-housing", "value": "a cracked housing that has compromised its structural integrity" },
-        { "id": "motor-seized", "value": "a seized motor beyond economical repair" },
-        { "id": "circuit-board-damage", "value": "extensive damage to the main circuit board" },
-        { "id": "water-intrusion-severe", "value": "severe internal water intrusion affecting multiple components" }
+        "a cracked housing that has compromised its structural integrity",
+        "a seized motor beyond economical repair",
+        "extensive damage to the main circuit board",
+        "severe internal water intrusion affecting multiple components"
       ],
       "requirement": [
-        { "id": "cracked-housing", "value": "we would recommend replacement rather than repair" },
-        { "id": "motor-seized", "value": "replacement of the unit is the more cost-effective option" },
-        { "id": "circuit-board-damage", "value": "the cost of a replacement board would exceed the value of repairing the unit" },
-        { "id": "water-intrusion-severe", "value": "we cannot guarantee reliability even after repair, so replacement may be the better option" }
+        "we would recommend replacement rather than repair",
+        "replacement of the unit is the more cost-effective option",
+        "the cost of a replacement board would exceed the value of repairing the unit",
+        "we cannot guarantee reliability even after repair, so replacement may be the better option"
       ]
     }
   },

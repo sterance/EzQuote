@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { ButtonGroup, TagFill } from "../types";
+import type { ButtonGroup } from "../types";
 import {
   extractTags,
   syncGroupFills,
@@ -82,7 +82,7 @@ export const useTemplateStore = () => {
 
   const updateGroupFills = (
     groupId: string,
-    fills: Record<string, TagFill[]>,
+    fills: Record<string, string[]>,
   ) => {
     setGroups((prev) =>
       prev.map((group) =>

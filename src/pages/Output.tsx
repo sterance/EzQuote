@@ -138,7 +138,15 @@ export function Output({
 
   return (
     <>
-      <Box className="button-sections" sx={{ position: "relative" }}>
+      <Box
+        className="button-sections"
+        sx={{
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
         <Button
           variant="outlined"
           color="error"
@@ -161,12 +169,26 @@ export function Output({
         >
           Clear All
         </Button>
-        {groups.map((group) => {
-        const tags = extractTags(group.template);
-        const hasTags = tags.length > 0;
+        {groups.map((group, index) => {
+          const tags = extractTags(group.template);
+          const hasTags = tags.length > 0;
 
-        if (!hasTags) {
-          // State 1: No tags → checkbox only, no child components
+          if (!hasTags) {
+            // State 1: No tags → checkbox only, no child components
+            return (
+              <OutputGroup
+                key={group.id}
+                label={group.label}
+                enabled={Boolean(enabledGroups[group.id])}
+                onToggleEnabled={(enabled) =>
+                  handleToggleGroup(group.id, enabled)
+                }
+                sx={{ mt: index === 0 ? 6 : 0 }}
+              />
+            );
+          }
+
+          // States 2-4: Has tags → checkbox + Options (handles dropdowns + text fields)
           return (
             <OutputGroup
               key={group.id}
@@ -175,35 +197,23 @@ export function Output({
               onToggleEnabled={(enabled) =>
                 handleToggleGroup(group.id, enabled)
               }
-            />
+              sx={{ mt: index === 0 ? 4 : 0 }}
+            >
+              <OutputOptions
+                fills={group.fills || {}}
+                template={group.template}
+                textFills={textFills[group.id] ?? {}}
+                enabled={Boolean(enabledGroups[group.id])}
+                onChange={(fills) =>
+                  setTextFills((current) => ({
+                    ...current,
+                    [group.id]: fills,
+                  }))
+                }
+              />
+            </OutputGroup>
           );
-        }
-
-        // States 2-4: Has tags → checkbox + Options (handles dropdowns + text fields)
-        return (
-          <OutputGroup
-            key={group.id}
-            label={group.label}
-            enabled={Boolean(enabledGroups[group.id])}
-            onToggleEnabled={(enabled) =>
-              handleToggleGroup(group.id, enabled)
-            }
-          >
-            <OutputOptions
-              fills={group.fills || {}}
-              template={group.template}
-              textFills={textFills[group.id] ?? {}}
-              enabled={Boolean(enabledGroups[group.id])}
-              onChange={(fills) =>
-                setTextFills((current) => ({
-                  ...current,
-                  [group.id]: fills,
-                }))
-              }
-            />
-          </OutputGroup>
-        );
-      })}
+        })}
       </Box>
 
       <Textbox label="Output" placeholder="" value={output} />

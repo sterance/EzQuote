@@ -13,15 +13,15 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DragHandleIcon from "@mui/icons-material/DragHandle";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { extractTags, generateId } from "../utils/templateUtils";
-import type { ButtonGroup, TagFill } from "../types";
+import { extractTags } from "../utils/templateUtils";
+import type { ButtonGroup } from "../types";
 import { InputModal } from "./InputModal";
 
 interface GroupEditorProps {
   group: ButtonGroup;
   updateGroup: (id: string, label: string, template: string) => void;
   deleteGroup: () => void;
-  updateGroupFills: (fills: Record<string, TagFill[]>) => void;
+  updateGroupFills: (fills: Record<string, string[]>) => void;
   confirmAction: (msg: string, action: () => void) => void;
 }
 
@@ -85,44 +85,39 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
   const groupTags = extractTags(group.template);
 
   const handleAddValue = (tag: string) => {
-    const next: Record<string, TagFill[]> = {
+    const next: Record<string, string[]> = {
       ...(group.fills || {}),
-      [tag]: [
-        ...((group.fills || {})[tag] ?? []),
-        { id: generateId(`${tag}-fill`), value: "" },
-      ],
+      [tag]: [...((group.fills || {})[tag] ?? []), ""],
     };
     updateGroupFills(next);
   };
 
-  const handleUpdateValue = (tag: string, fillId: string, value: string) => {
+  const handleUpdateValue = (tag: string, index: number, value: string) => {
     const list = (group.fills || {})[tag] ?? [];
-    const next: Record<string, TagFill[]> = {
+    const next: Record<string, string[]> = {
       ...(group.fills || {}),
-      [tag]: list.map((f) => (f.id === fillId ? { ...f, value } : f)),
+      [tag]: list.map((v, i) => (i === index ? value : v)),
     };
     updateGroupFills(next);
   };
 
-  const handleDeleteValue = (tag: string, fillId: string) => {
+  const handleDeleteValue = (tag: string, index: number) => {
     const list = (group.fills || {})[tag] ?? [];
-    const target = list.find((f) => f.id === fillId);
-    if (!target) return;
-    if (target.value) {
+    if (list[index]) {
       confirmAction(
         `Are you sure you want to delete this "${tag}" fill value?`,
-        () => commitDeleteValue(tag, fillId),
+        () => commitDeleteValue(tag, index),
       );
       return;
     }
-    commitDeleteValue(tag, fillId);
+    commitDeleteValue(tag, index);
   };
 
-  const commitDeleteValue = (tag: string, fillId: string) => {
+  const commitDeleteValue = (tag: string, index: number) => {
     const list = (group.fills || {})[tag] ?? [];
-    const next: Record<string, TagFill[]> = {
+    const next: Record<string, string[]> = {
       ...(group.fills || {}),
-      [tag]: list.filter((f) => f.id !== fillId),
+      [tag]: list.filter((_, i) => i !== index),
     };
     updateGroupFills(next);
   };
@@ -339,9 +334,9 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
                         No fill values yet.
                       </Typography>
                     ) : (
-                      list.map((fill, idx) => (
+                      list.map((value, idx) => (
                         <Box
-                          key={fill.id}
+                          key={idx}
                           sx={{ display: "flex", alignItems: "center", gap: 1 }}
                         >
                           <Typography
@@ -353,16 +348,16 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
                           <TextField
                             fullWidth
                             size="small"
-                            value={fill.value}
+                            value={value}
                             onChange={(e) =>
-                              handleUpdateValue(tag, fill.id, e.target.value)
+                              handleUpdateValue(tag, idx, e.target.value)
                             }
                             placeholder={`Value for ${tag}`}
                           />
                           <IconButton
                             size="small"
                             color="error"
-                            onClick={() => handleDeleteValue(tag, fill.id)}
+                            onClick={() => handleDeleteValue(tag, idx)}
                             aria-label={`Delete ${tag} value`}
                           >
                             <DeleteIcon fontSize="small" />

@@ -1,5 +1,3 @@
-import type { TagFill } from "../types";
-
 export const generateId = (label: string): string => {
   return label
     .toLowerCase()
@@ -22,10 +20,10 @@ export const extractTags = (template: string): string[] => {
 };
 
 export const syncGroupFills = (
-  currentFills: Record<string, TagFill[]>,
+  currentFills: Record<string, string[]>,
   newTags: string[],
-): Record<string, TagFill[]> => {
-  const syncedFills: Record<string, TagFill[]> = {};
+): Record<string, string[]> => {
+  const syncedFills: Record<string, string[]> = {};
   for (const tag of newTags) {
     syncedFills[tag] = currentFills[tag] ?? [];
   }
