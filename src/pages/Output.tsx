@@ -2,7 +2,7 @@ import { Alert, Box, Button, Snackbar } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useTemplateStore } from "../hooks/useTemplateStore";
 import OutputGroup from "../components/OutputGroup";
-import FillableGroup from "../components/FillableGroup";
+import OutputOptions from "../components/OutputOptions";
 import Textbox from "../components/Textbox";
 import { extractTags } from "../utils/templateUtils";
 import { ConfirmationModal } from "../components/ConfirmationModal";
@@ -64,13 +64,6 @@ export function Output({
 
   const handleToggleGroup = (groupId: string, enabled: boolean) => {
     setEnabledGroups((current) => ({ ...current, [groupId]: enabled }));
-  };
-
-  const handleTextChange = (groupId: string, tag: string, value: string) => {
-    setTextFills((current) => ({
-      ...current,
-      [groupId]: { ...(current[groupId] ?? {}), [tag]: value },
-    }));
   };
 
   const output = useMemo(() => {
@@ -169,45 +162,48 @@ export function Output({
           Clear All
         </Button>
         {groups.map((group) => {
-          const hasFills =
-            group.fills && Object.values(group.fills).some((l) => l.length > 0);
-          const hasTags = extractTags(group.template).length > 0;
-          const useFreeText = !hasFills && hasTags;
+        const tags = extractTags(group.template);
+        const hasTags = tags.length > 0;
 
-          if (useFreeText) {
-            return (
-              <FillableGroup
-                key={group.id}
-                label={group.label}
-                template={group.template}
-                value={textFills[group.id] ?? {}}
-                enabled={Boolean(enabledGroups[group.id])}
-                onChange={(tag, value) => handleTextChange(group.id, tag, value)}
-                onToggleEnabled={(enabled) =>
-                  handleToggleGroup(group.id, enabled)
-                }
-              />
-            );
-          }
+        if (!hasTags) {
+          // State 1: No tags → checkbox only, no child components
           return (
             <OutputGroup
               key={group.id}
               label={group.label}
-              fills={group.fills || {}}
-              template={group.template}
               enabled={Boolean(enabledGroups[group.id])}
               onToggleEnabled={(enabled) =>
                 handleToggleGroup(group.id, enabled)
               }
-              onChange={(fills) => {
+            />
+          );
+        }
+
+        // States 2-4: Has tags → checkbox + Options (handles dropdowns + text fields)
+        return (
+          <OutputGroup
+            key={group.id}
+            label={group.label}
+            enabled={Boolean(enabledGroups[group.id])}
+            onToggleEnabled={(enabled) =>
+              handleToggleGroup(group.id, enabled)
+            }
+          >
+            <OutputOptions
+              fills={group.fills || {}}
+              template={group.template}
+              textFills={textFills[group.id] ?? {}}
+              enabled={Boolean(enabledGroups[group.id])}
+              onChange={(fills) =>
                 setTextFills((current) => ({
                   ...current,
                   [group.id]: fills,
-                }));
-              }}
+                }))
+              }
             />
-          );
-        })}
+          </OutputGroup>
+        );
+      })}
       </Box>
 
       <Textbox label="Output" placeholder="" value={output} />

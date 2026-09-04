@@ -1,29 +1,21 @@
+import { useId } from "react";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
-import { useId } from "react";
-import OutputDropdowns from "./OutputDropdowns";
-import type { TagFill } from "../types";
 
 interface OutputGroupProps {
   label: string;
-  fills: Record<string, TagFill[]>;
-  template: string;
   enabled: boolean;
   onToggleEnabled: (enabled: boolean) => void;
-  onChange: (fills: Record<string, string>) => void;
+  children?: React.ReactNode;
 }
 
 export default function OutputGroup({
   label,
-  fills,
-  template,
   enabled,
   onToggleEnabled,
-  onChange,
+  children,
 }: OutputGroupProps) {
   const groupId = useId();
-  const labelId = `${groupId}-label`;
-  const toggleId = `${groupId}-toggle`;
 
   return (
     <Box
@@ -38,7 +30,7 @@ export default function OutputGroup({
     >
       <Box
         component="label"
-        htmlFor={toggleId}
+        htmlFor={`checkbox-${groupId}`}
         sx={{
           display: "flex",
           alignItems: "center",
@@ -47,7 +39,7 @@ export default function OutputGroup({
         }}
       >
         <Checkbox
-          id={toggleId}
+          id={`checkbox-${groupId}`}
           size="small"
           checked={enabled}
           onChange={(event) => onToggleEnabled(event.target.checked)}
@@ -55,19 +47,14 @@ export default function OutputGroup({
         />
         <Box
           component="span"
-          id={labelId}
+          id={`label-${groupId}`}
           className="button-group-label"
           sx={{ m: 0, alignSelf: "center" }}
         >
           {label}
         </Box>
       </Box>
-      <OutputDropdowns
-        fills={fills}
-        template={template}
-        enabled={enabled}
-        onChange={onChange}
-      />
+      {children}
     </Box>
   );
 }

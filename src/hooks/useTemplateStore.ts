@@ -5,9 +5,17 @@ import {
   syncGroupFills,
   generateId,
 } from "../utils/templateUtils";
-import { buttonGroups as defaultButtonGroups } from "../data/buttonGroups";
 
 const STORAGE_KEY = "template_data";
+
+const defaultButtonGroups: ButtonGroup[] = [
+  {
+    id: generateId("Default Group"),
+    label: "Default Group",
+    template: "",
+    fills: {},
+  },
+];
 
 export const useTemplateStore = () => {
   const [groups, setGroups] = useState<ButtonGroup[]>(() => {
