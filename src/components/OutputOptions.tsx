@@ -7,6 +7,19 @@ import Typography from "@mui/material/Typography";
 import { useMemo, useState, useEffect } from "react";
 import { extractTags } from "../utils/templateUtils";
 
+const SETTINGS_DATA_KEY = "settings_data";
+const TEXT_ALIGNMENT_KEY = "text_alignment";
+type TextAlignment = "left" | "center" | "right";
+
+function getSettings(): Record<string, unknown> {
+  try {
+    const saved = localStorage.getItem(SETTINGS_DATA_KEY);
+    return saved ? JSON.parse(saved) : {};
+  } catch {
+    return {};
+  }
+}
+
 interface OutputOptionsProps {
   fills: Record<string, string[]>;
   template: string;
@@ -26,12 +39,35 @@ export default function OutputOptions({
     return document.documentElement.getAttribute("data-theme") === "dark";
   });
 
+  const [textAlignment, setTextAlignment] = useState<TextAlignment>(() => {
+    return (getSettings()[TEXT_ALIGNMENT_KEY] as TextAlignment) || "center";
+  });
+
   useEffect(() => {
     const observer = new MutationObserver(() => {
-      setIsDarkMode(document.documentElement.getAttribute("data-theme") === "dark");
+      setIsDarkMode(
+        document.documentElement.getAttribute("data-theme") === "dark",
+      );
     });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const sync = () => {
+      setTextAlignment(
+        (getSettings()[TEXT_ALIGNMENT_KEY] as TextAlignment) || "center",
+      );
+    };
+    window.addEventListener("storage", sync);
+    window.addEventListener("settings-changed", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("settings-changed", sync);
+    };
   }, []);
 
   const tags = useMemo(() => extractTags(template), [template]);
@@ -43,7 +79,6 @@ export default function OutputOptions({
   };
 
   const labelColor = isDarkMode ? "white" : "inherit";
-
   return (
     <Box
       sx={{
@@ -64,10 +99,18 @@ export default function OutputOptions({
           const selectId = `dropdown-${tag}`;
 
           return (
-            <FormControl key={tag} size="small" sx={{ flex: "1 1 200px", minWidth: 120 }}>
+            <FormControl
+              key={tag}
+              size="small"
+              sx={{ flex: "1 1 200px", minWidth: 120 }}
+            >
               <Typography
                 variant="h6"
-                sx={{ textAlign: "center", textTransform: "capitalize", color: labelColor }}
+                sx={{
+                  textAlign: "center",
+                  textTransform: "capitalize",
+                  color: labelColor,
+                }}
               >
                 {tag}
               </Typography>
@@ -77,10 +120,23 @@ export default function OutputOptions({
                 onChange={(e) => handleChange(tag, e.target.value)}
                 displayEmpty
                 disabled={!enabled}
+                sx={{ textAlign: textAlignment }}
+                MenuProps={{
+                  slotProps: {
+                    paper: {
+                      sx: {
+                        bgcolor: isDarkMode ? "#17272d" : "#fffdf8",
+                        color: isDarkMode ? "#edf1e8" : "#24313b",
+                      },
+                    },
+                  },
+                }}
               >
                 {list.map((val) => (
                   <MenuItem key={val} value={val}>
-                    {val}
+                    <Typography component="span" sx={{ textAlign: textAlignment, width: "100%" }}>
+                      {val}
+                    </Typography>
                   </MenuItem>
                 ))}
               </Select>
@@ -89,10 +145,18 @@ export default function OutputOptions({
         }
 
         return (
-          <FormControl key={tag} size="small" sx={{ flex: "1 1 200px", minWidth: 120 }}>
+          <FormControl
+            key={tag}
+            size="small"
+            sx={{ flex: "1 1 200px", minWidth: 120 }}
+          >
             <Typography
               variant="h6"
-              sx={{ textAlign: "center", textTransform: "capitalize", color: labelColor }}
+              sx={{
+                textAlign: "center",
+                textTransform: "capitalize",
+                color: labelColor,
+              }}
             >
               {tag}
             </Typography>
@@ -101,6 +165,7 @@ export default function OutputOptions({
               onChange={(event) => handleChange(tag, event.target.value)}
               size="small"
               disabled={!enabled}
+              slotProps={{ htmlInput: { style: { textAlign: textAlignment } } }}
             />
           </FormControl>
         );

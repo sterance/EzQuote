@@ -154,7 +154,13 @@ export function Output({
           onClick={onToggleAdvancedMode}
           className="advanced-btn"
           startIcon={advancedMode ? <RocketLaunchIcon /> : <AdjustIcon />}
-          sx={{ position: "absolute", top: 8, left: 8, zIndex: 1 }}
+          sx={{
+            position: "absolute",
+            top: 8,
+            left: 8,
+            zIndex: 1,
+            display: "none", // button disabled until simple/advanced functionality implemented, remove this line to re-enable
+          }}
         >
           {advancedMode ? "Advanced Mode" : "Simple Mode"}
         </Button>
