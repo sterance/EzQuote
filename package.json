@@ -62,7 +62,7 @@
       ],
       "icon": "build/icon.ico",
       "signtoolOptions": {
-        "sign": "./build/win-sign.cjs"
+        "rfc3161TimeStampServer": "http://timestamp.sectigo.com"
       }
     },
     "portable": {
