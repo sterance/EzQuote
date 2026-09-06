@@ -40,10 +40,11 @@
   },
   {
     "label": "Filter Cartridge",
-    "template": "Your filter cartridge has {condition}, and this will require {requirement}.",
+    "template": "Your filter cartridge has {condition}, and this will require {requirement}. {action}",
     "fills": {
       "condition": ["a torn filter element", "become heavily clogged with debris", "arrived without a filter cartridge installed", "an incorrectly sized cartridge installed"],
-      "requirement": ["a full cartridge replacement", "a replacement cartridge to be sized and ordered"]
+      "requirement": ["a full cartridge replacement", "a replacement cartridge to be sized and ordered"],
+      "action": ["We recommend scheduling the replacement at your earliest convenience.", "We will attempt to clean and reuse the cartridge if possible.", "Please ensure the correct cartridge size is available for installation."]
     }
   },
   {

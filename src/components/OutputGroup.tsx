@@ -47,7 +47,7 @@ export default function OutputGroup({ label, enabled, onToggleEnabled, children,
             opacity: enabled ? 1 : 0.55,
           }}
         >
-          <Checkbox id={`checkbox-${groupId}`} size="small" checked={enabled} onChange={(event) => onToggleEnabled(event.target.checked)} sx={{ p: 0.5 }} />
+          <Checkbox id={`checkbox-${groupId}`} size="small" checked={enabled} onChange={(event) => onToggleEnabled(event.target.checked)} sx={{ p: 0.5, "&.Mui-checked": { color: "var(--accent)" } }} />
           <Box component="span" id={`label-${groupId}`} className="button-group-label" sx={{ m: 0, alignSelf: "center" }}>
             {label}
           </Box>
