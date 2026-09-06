@@ -147,12 +147,14 @@ export function Output({ advancedMode, onToggleAdvancedMode }: { advancedMode: b
         >
           {advancedMode ? "Advanced Mode" : "Simple Mode"}
         </Button>
-        <Button variant="outlined" color="error" size="small" onClick={() => setClearConfirmOpen(true)} disabled={!hasDataToClear} className="clear-all-btn" sx={{ position: "absolute", top: 8, right: 8, zIndex: 1 }}>
-          Clear All
-        </Button>
+        {groups.length > 0 && (
+          <Button variant="outlined" color="error" size="small" onClick={() => setClearConfirmOpen(true)} disabled={!hasDataToClear} className="clear-all-btn" sx={{ position: "absolute", top: 8, right: 8, zIndex: 1 }}>
+            Clear All
+          </Button>
+        )}
         {groups.length === 0 && (
           <Box sx={{ m: 0, textAlign: "center" }}>
-            No template groups exist. Create or import templates on the{" "}
+            No template groups exist yet. Create or import templates on the{" "}
             <Link component={RouterLink} to="/templates">
               Templates page
             </Link>

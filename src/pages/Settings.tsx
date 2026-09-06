@@ -1,15 +1,6 @@
-import {
-  Box,
-  FormLabel,
-  ToggleButton,
-  ToggleButtonGroup,
-} from "@mui/material";
+import { Box, FormLabel, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import * as React from "react";
-import {
-  applyThemeVars,
-  DARK_THEMES,
-  LIGHT_THEMES,
-} from "../themeOptions";
+import { applyThemeVars, DARK_THEMES, LIGHT_THEMES } from "../themeOptions";
 
 const SETTINGS_DATA_KEY = "settings_data";
 const TEXT_ALIGNMENT_KEY = "text_alignment";
@@ -28,10 +19,7 @@ function getSettings(): Record<string, unknown> {
 
 function saveSettings(updates: Record<string, unknown>) {
   const current = getSettings();
-  localStorage.setItem(
-    SETTINGS_DATA_KEY,
-    JSON.stringify({ ...current, ...updates }),
-  );
+  localStorage.setItem(SETTINGS_DATA_KEY, JSON.stringify({ ...current, ...updates }));
 }
 
 export function Settings() {
@@ -41,9 +29,7 @@ export function Settings() {
 
   React.useEffect(() => {
     const observer = new MutationObserver(() => {
-      setIsDarkMode(
-        document.documentElement.getAttribute("data-theme") === "dark",
-      );
+      setIsDarkMode(document.documentElement.getAttribute("data-theme") === "dark");
     });
     observer.observe(document.documentElement, {
       attributes: true,
@@ -52,12 +38,10 @@ export function Settings() {
     return () => observer.disconnect();
   }, []);
 
-  const [textAlignment, setTextAlignment] = React.useState<TextAlignment>(
-    () => {
-      const settings = getSettings();
-      return (settings[TEXT_ALIGNMENT_KEY] as TextAlignment) || "center";
-    },
-  );
+  const [textAlignment, setTextAlignment] = React.useState<TextAlignment>(() => {
+    const settings = getSettings();
+    return (settings[TEXT_ALIGNMENT_KEY] as TextAlignment) || "center";
+  });
 
   const [lightThemeIndex, setLightThemeIndex] = React.useState<number>(() => {
     const settings = getSettings();
@@ -71,10 +55,7 @@ export function Settings() {
     return typeof value === "number" ? value : 0;
   });
 
-  const handleAlignmentChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newAlignment: TextAlignment | null,
-  ) => {
+  const handleAlignmentChange = (_event: React.MouseEvent<HTMLElement>, newAlignment: TextAlignment | null) => {
     if (newAlignment !== null) {
       setTextAlignment(newAlignment);
       saveSettings({ [TEXT_ALIGNMENT_KEY]: newAlignment });
@@ -82,10 +63,7 @@ export function Settings() {
     }
   };
 
-  const handleLightThemeChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newIndex: number | null,
-  ) => {
+  const handleLightThemeChange = (_event: React.MouseEvent<HTMLElement>, newIndex: number | null) => {
     if (newIndex !== null) {
       setLightThemeIndex(newIndex);
       saveSettings({ [LIGHT_THEME_KEY]: newIndex });
@@ -96,10 +74,7 @@ export function Settings() {
     }
   };
 
-  const handleDarkThemeChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newIndex: number | null,
-  ) => {
+  const handleDarkThemeChange = (_event: React.MouseEvent<HTMLElement>, newIndex: number | null) => {
     if (newIndex !== null) {
       setDarkThemeIndex(newIndex);
       saveSettings({ [DARK_THEME_KEY]: newIndex });
@@ -112,26 +87,29 @@ export function Settings() {
 
   return (
     <>
-      <Box className="settings-sections" sx={{ position: "relative" }}>
+      <Box
+        className="settings-sections"
+        sx={{
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         <Box sx={{ mb: 3 }}>
           <FormLabel
             sx={{
               display: "block",
               mb: 1,
+              fontSize: "1.25rem",
               fontWeight: "bold",
               color: "var(--text)",
+              textAlign: "center",
             }}
           >
             Text Alignment
           </FormLabel>
-          <ToggleButtonGroup
-            value={textAlignment}
-            exclusive
-            onChange={handleAlignmentChange}
-            aria-label="text alignment"
-            size="small"
-            sx={toggleGroupSx(isDarkMode)}
-          >
+          <ToggleButtonGroup value={textAlignment} exclusive onChange={handleAlignmentChange} aria-label="text alignment" size="small" sx={toggleGroupSx(isDarkMode)}>
             <ToggleButton value="left" aria-label="left align">
               Left
             </ToggleButton>
@@ -149,28 +127,17 @@ export function Settings() {
             sx={{
               display: "block",
               mb: 1,
+              fontSize: "1.25rem",
               fontWeight: "bold",
               color: "var(--text)",
+              textAlign: "center",
             }}
           >
             Light Mode Theme
           </FormLabel>
-          <ToggleButtonGroup
-            value={lightThemeIndex}
-            exclusive
-            onChange={handleLightThemeChange}
-            aria-label="light mode theme"
-            size="small"
-            sx={toggleGroupSx(isDarkMode)}
-          >
+          <ToggleButtonGroup value={lightThemeIndex} exclusive onChange={handleLightThemeChange} aria-label="light mode theme" size="small" sx={toggleGroupSx(isDarkMode)}>
             {LIGHT_THEMES.map((theme, index) => (
-              <ToggleButton
-                key={theme.label}
-                value={index}
-                aria-label={theme.label}
-                title={theme.label}
-                sx={toggleButtonSx(isDarkMode)}
-              >
+              <ToggleButton key={theme.label} value={index} aria-label={theme.label} title={theme.label} sx={toggleButtonSx(isDarkMode)}>
                 <Box
                   component="span"
                   aria-hidden="true"
@@ -196,28 +163,17 @@ export function Settings() {
             sx={{
               display: "block",
               mb: 1,
+              fontSize: "1.25rem",
               fontWeight: "bold",
               color: "var(--text)",
+              textAlign: "center",
             }}
           >
             Dark Mode Theme
           </FormLabel>
-          <ToggleButtonGroup
-            value={darkThemeIndex}
-            exclusive
-            onChange={handleDarkThemeChange}
-            aria-label="dark mode theme"
-            size="small"
-            sx={toggleGroupSx(isDarkMode)}
-          >
+          <ToggleButtonGroup value={darkThemeIndex} exclusive onChange={handleDarkThemeChange} aria-label="dark mode theme" size="small" sx={toggleGroupSx(isDarkMode)}>
             {DARK_THEMES.map((theme, index) => (
-              <ToggleButton
-                key={theme.label}
-                value={index}
-                aria-label={theme.label}
-                title={theme.label}
-                sx={toggleButtonSx(isDarkMode)}
-              >
+              <ToggleButton key={theme.label} value={index} aria-label={theme.label} title={theme.label} sx={toggleButtonSx(isDarkMode)}>
                 <Box
                   component="span"
                   aria-hidden="true"
