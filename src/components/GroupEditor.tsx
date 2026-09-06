@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Box, Button, TextField, Typography, Paper, Stack, IconButton, Divider } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
+import { Box, Button, TextField, Typography, Paper, Stack, IconButton, Divider, Link } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DragHandleIcon from "@mui/icons-material/DragHandle";
-import { useSortable } from "@dnd-kit/sortable";
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { extractTags } from "../utils/templateUtils";
+import { extractTags, generateId } from "../utils/templateUtils";
 import type { ButtonGroup } from "../types";
 import { InputModal } from "./InputModal";
 
@@ -12,11 +13,48 @@ interface GroupEditorProps {
   group: ButtonGroup;
   updateGroup: (id: string, label: string, template: string) => void;
   deleteGroup: () => void;
-  updateGroupFills: (fills: Record<string, string[]>) => void;
+  updateGroupFills: (fills: Record<string, string[]>, fillIds?: Record<string, string[]>) => void;
   confirmAction: (msg: string, action: () => void) => void;
   editingGroupId: string | null;
   onExitEdit: () => void;
 }
+
+interface SortableFillRowProps {
+  id: string;
+  groupId: string;
+  fillId: string;
+  tag: string;
+  index: number;
+  value: string;
+  onChange: (value: string) => void;
+  onDelete: () => void;
+}
+
+const SortableFillRow: React.FC<SortableFillRowProps> = ({ id, groupId, fillId, tag, index, value, onChange, onDelete }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+    data: { type: "fill", groupId, tag, fillId },
+  });
+
+  return (
+    <Box
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+      }}
+      sx={{ display: "flex", alignItems: "center", gap: 1, opacity: isDragging ? 0.5 : 1 }}
+    >
+      <Typography variant="caption" {...attributes} {...listeners} sx={{ minWidth: 24, color: "text.secondary", cursor: "grab", userSelect: "none", touchAction: "none" }} aria-label={`Reorder ${tag} value ${index + 1}`}>
+        {index + 1}.
+      </Typography>
+      <TextField fullWidth size="small" value={value} onChange={(event) => onChange(event.target.value)} placeholder={`Value for ${tag}`} />
+      <IconButton size="small" color="error" onClick={onDelete} aria-label={`Delete ${tag} value`}>
+        <DeleteIcon fontSize="small" />
+      </IconButton>
+    </Box>
+  );
+};
 
 export const GroupEditor: React.FC<GroupEditorProps> = ({ group, updateGroup, deleteGroup, updateGroupFills, confirmAction, editingGroupId, onExitEdit }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -104,11 +142,17 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({ group, updateGroup, de
   const groupTags = extractTags(group.template);
 
   const handleAddValue = (tag: string) => {
+    const list = (group.fills || {})[tag] ?? [];
+    const fillIds = group.fillIds || {};
+    const nextFillId = generateId();
     const next: Record<string, string[]> = {
       ...(group.fills || {}),
-      [tag]: [...((group.fills || {})[tag] ?? []), ""],
+      [tag]: [...list, ""],
     };
-    updateGroupFills(next);
+    updateGroupFills(next, {
+      ...fillIds,
+      [tag]: [...(fillIds[tag] ?? []), nextFillId],
+    });
   };
 
   const handleUpdateValue = (tag: string, index: number, value: string) => {
@@ -131,11 +175,15 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({ group, updateGroup, de
 
   const commitDeleteValue = (tag: string, index: number) => {
     const list = (group.fills || {})[tag] ?? [];
+    const fillIds = group.fillIds || {};
     const next: Record<string, string[]> = {
       ...(group.fills || {}),
       [tag]: list.filter((_, i) => i !== index),
     };
-    updateGroupFills(next);
+    updateGroupFills(next, {
+      ...fillIds,
+      [tag]: (fillIds[tag] ?? []).filter((_, i) => i !== index),
+    });
   };
 
   return (
@@ -305,6 +353,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({ group, updateGroup, de
             ) : (
               groupTags.map((tag) => {
                 const list = (group.fills || {})[tag] ?? [];
+                const fillIds = (group.fillIds || {})[tag] ?? [];
                 return (
                   <Box
                     key={tag}
@@ -325,21 +374,19 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({ group, updateGroup, de
                     </Typography>
                     <Divider />
                     {list.length === 0 ? (
-                      <Typography variant="caption" color="text.secondary">
-                        No fill values yet.
+                      <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center" }}>
+                        No fill values yet. Will appear as a custom text input field in the{" "}
+                        <Link component={RouterLink} to="/output">
+                          Output page
+                        </Link>
+                        .
                       </Typography>
                     ) : (
-                      list.map((value, idx) => (
-                        <Box key={idx} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                          <Typography variant="caption" sx={{ minWidth: 24, color: "text.secondary" }}>
-                            {idx + 1}.
-                          </Typography>
-                          <TextField fullWidth size="small" value={value} onChange={(e) => handleUpdateValue(tag, idx, e.target.value)} placeholder={`Value for ${tag}`} />
-                          <IconButton size="small" color="error" onClick={() => handleDeleteValue(tag, idx)} aria-label={`Delete ${tag} value`}>
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      ))
+                      <SortableContext items={list.map((_, i) => `fill:${group.id}:${fillIds[i]}`)}>
+                        {list.map((value, idx) => (
+                          <SortableFillRow key={fillIds[idx]} id={`fill:${group.id}:${fillIds[idx]}`} groupId={group.id} fillId={fillIds[idx]} tag={tag} index={idx} value={value} onChange={(v) => handleUpdateValue(tag, idx, v)} onDelete={() => handleDeleteValue(tag, idx)} />
+                        ))}
+                      </SortableContext>
                     )}
                     <Button
                       size="small"

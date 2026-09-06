@@ -37,8 +37,8 @@
 
 .main-content a,
 .main-content a:visited {
-  color: var(--accent);
-  text-decoration-color: var(--accent);
+  color: var(--accent) !important;
+  text-decoration-color: var(--accent) !important;
 }
 
 .top-nav {

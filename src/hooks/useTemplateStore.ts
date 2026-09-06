@@ -1,19 +1,30 @@
 import { useState, useEffect } from "react";
 import type { ButtonGroup } from "../types";
-import {
-  extractTags,
-  syncGroupFills,
-  generateId,
-} from "../utils/templateUtils";
+import { extractTags, syncGroupFills, syncFillIds, generateId } from "../utils/templateUtils";
 
 const STORAGE_KEY = "template_data";
+
+const normalizeGroup = (group: Partial<ButtonGroup>): ButtonGroup => {
+  const id = group.id ?? generateId();
+  const fills = group.fills ?? {};
+  const tags = extractTags(group.template ?? "");
+
+  return {
+    id,
+    label: group.label ?? "",
+    template: group.template ?? "",
+    fills: syncGroupFills(fills, tags),
+    fillIds: syncFillIds(group.fillIds, fills, tags, generateId),
+  };
+};
 
 export const useTemplateStore = () => {
   const [groups, setGroups] = useState<ButtonGroup[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed.map(normalizeGroup) : [];
       } catch {
         console.error("Failed to parse local storage data.");
       }
@@ -27,11 +38,7 @@ export const useTemplateStore = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
   }, [groups]);
 
-  const updateGroup = (
-    groupId: string,
-    newLabel: string,
-    newTemplate: string,
-  ) => {
+  const updateGroup = (groupId: string, newLabel: string, newTemplate: string) => {
     setGroups((prev) =>
       prev.map((group) => {
         if (group.id !== groupId) return group;
@@ -41,10 +48,10 @@ export const useTemplateStore = () => {
 
         return {
           ...group,
-          id: generateId(newLabel),
           label: newLabel,
           template: newTemplate,
           fills: updatedFills,
+          fillIds: syncFillIds(group.fillIds, updatedFills, newTags, generateId),
         };
       }),
     );
@@ -65,22 +72,26 @@ export const useTemplateStore = () => {
 
   const addGroup = () => {
     const newGroup: ButtonGroup = {
-      id: generateId(""),
+      id: generateId(),
       label: "",
       template: "",
       fills: {},
+      fillIds: {},
     };
     setGroups((prev) => [...prev, newGroup]);
     setEditingGroupId(newGroup.id);
   };
 
-  const updateGroupFills = (
-    groupId: string,
-    fills: Record<string, string[]>,
-  ) => {
+  const updateGroupFills = (groupId: string, fills: Record<string, string[]>, fillIds?: Record<string, string[]>) => {
     setGroups((prev) =>
       prev.map((group) =>
-        group.id === groupId ? { ...group, fills } : group,
+        group.id === groupId
+          ? {
+              ...group,
+              fills,
+              fillIds: fillIds ?? syncFillIds(group.fillIds, fills, extractTags(group.template), generateId),
+            }
+          : group,
       ),
     );
   };
@@ -88,11 +99,8 @@ export const useTemplateStore = () => {
   const importData = (jsonData: string) => {
     try {
       const parsed = JSON.parse(jsonData);
-      if (
-        Array.isArray(parsed) &&
-        parsed.every((g) => g.id && g.label && typeof g.template === "string")
-      ) {
-        setGroups(parsed);
+      if (Array.isArray(parsed) && parsed.every((g) => typeof g.label === "string" && g.label.length > 0 && typeof g.template === "string")) {
+        setGroups(parsed.map((g) => normalizeGroup({ ...g, id: generateId() })));
         return true;
       }
       return false;
