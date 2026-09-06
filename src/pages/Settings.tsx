@@ -109,7 +109,7 @@ export function Settings() {
           >
             Text Alignment
           </FormLabel>
-          <ToggleButtonGroup value={textAlignment} exclusive onChange={handleAlignmentChange} aria-label="text alignment" size="small" sx={toggleGroupSx(isDarkMode)}>
+          <ToggleButtonGroup value={textAlignment} exclusive onChange={handleAlignmentChange} aria-label="text alignment" size="small" sx={toggleGroupSx}>
             <ToggleButton value="left" aria-label="left align">
               Left
             </ToggleButton>
@@ -135,9 +135,9 @@ export function Settings() {
           >
             Light Mode Theme
           </FormLabel>
-          <ToggleButtonGroup value={lightThemeIndex} exclusive onChange={handleLightThemeChange} aria-label="light mode theme" size="small" sx={toggleGroupSx(isDarkMode)}>
+          <ToggleButtonGroup value={lightThemeIndex} exclusive onChange={handleLightThemeChange} aria-label="light mode theme" size="small" sx={toggleGroupSx}>
             {LIGHT_THEMES.map((theme, index) => (
-              <ToggleButton key={theme.label} value={index} aria-label={theme.label} title={theme.label} sx={toggleButtonSx(isDarkMode)}>
+              <ToggleButton key={theme.label} value={index} aria-label={theme.label} title={theme.label} sx={toggleButtonSx}>
                 <Box
                   component="span"
                   aria-hidden="true"
@@ -171,9 +171,9 @@ export function Settings() {
           >
             Dark Mode Theme
           </FormLabel>
-          <ToggleButtonGroup value={darkThemeIndex} exclusive onChange={handleDarkThemeChange} aria-label="dark mode theme" size="small" sx={toggleGroupSx(isDarkMode)}>
+          <ToggleButtonGroup value={darkThemeIndex} exclusive onChange={handleDarkThemeChange} aria-label="dark mode theme" size="small" sx={toggleGroupSx}>
             {DARK_THEMES.map((theme, index) => (
-              <ToggleButton key={theme.label} value={index} aria-label={theme.label} title={theme.label} sx={toggleButtonSx(isDarkMode)}>
+              <ToggleButton key={theme.label} value={index} aria-label={theme.label} title={theme.label} sx={toggleButtonSx}>
                 <Box
                   component="span"
                   aria-hidden="true"
@@ -198,36 +198,33 @@ export function Settings() {
   );
 }
 
-function toggleGroupSx(isDarkMode: boolean) {
+function toggleGroupSx() {
   return {
     flexWrap: "wrap",
-    bgcolor: isDarkMode ? "var(--surface)" : "transparent",
-    border: isDarkMode ? "1px solid var(--text)" : undefined,
+    bgcolor: "var(--surface)",
     "& .MuiToggleButton-root": {
       color: "var(--text)",
-      border: isDarkMode ? "1px solid var(--text)" : undefined,
+      borderColor: "var(--text-muted)",
       "&.Mui-selected": {
-        bgcolor: isDarkMode ? "var(--surface-muted)" : undefined,
+        bgcolor: "var(--surface-muted)",
         color: "var(--text)",
       },
       "&:hover": {
-        bgcolor: isDarkMode ? "var(--surface-muted)" : undefined,
+        bgcolor: "var(--surface-muted)",
       },
     },
   } as const;
 }
 
-function toggleButtonSx(isDarkMode: boolean) {
+function toggleButtonSx() {
   return {
-    textTransform: "none",
-    border: isDarkMode ? "1px solid var(--text)" : undefined,
     color: "var(--text)",
     "&.Mui-selected": {
-      bgcolor: isDarkMode ? "var(--surface-muted)" : undefined,
+      bgcolor: "var(--surface-muted)",
       color: "var(--text)",
     },
     "&:hover": {
-      bgcolor: isDarkMode ? "var(--surface-muted)" : undefined,
+      bgcolor: "var(--surface-muted)",
     },
   } as const;
 }
