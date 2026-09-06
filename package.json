@@ -61,7 +61,9 @@
         "portable"
       ],
       "icon": "build/icon.ico",
-      "sign": "./build/win-sign.js"
+      "signtoolOptions": {
+        "sign": "./build/win-sign.js"
+      }
     },
     "portable": {
       "artifactName": "${productName}-${version}.exe"
