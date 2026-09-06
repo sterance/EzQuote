@@ -26,6 +26,8 @@ export const Templates: React.FC = () => {
     importData,
     reorderGroups,
     clearAll,
+    editingGroupId,
+    clearEditingGroupId,
   } = useTemplateStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -117,6 +119,8 @@ export const Templates: React.FC = () => {
                   updateGroupFills(group.id, fills)
                 }
                 confirmAction={confirmAction}
+                editingGroupId={editingGroupId}
+                onExitEdit={clearEditingGroupId}
               />
             ))}
           </Stack>

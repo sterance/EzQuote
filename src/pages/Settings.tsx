@@ -5,9 +5,16 @@ import {
   ToggleButtonGroup,
 } from "@mui/material";
 import * as React from "react";
+import {
+  applyThemeVars,
+  DARK_THEMES,
+  LIGHT_THEMES,
+} from "../themeOptions";
 
 const SETTINGS_DATA_KEY = "settings_data";
 const TEXT_ALIGNMENT_KEY = "text_alignment";
+const LIGHT_THEME_KEY = "light_theme_index";
+const DARK_THEME_KEY = "dark_theme_index";
 type TextAlignment = "left" | "center" | "right";
 
 function getSettings(): Record<string, unknown> {
@@ -19,11 +26,11 @@ function getSettings(): Record<string, unknown> {
   }
 }
 
-function saveSettings(alignment: TextAlignment) {
+function saveSettings(updates: Record<string, unknown>) {
   const current = getSettings();
   localStorage.setItem(
     SETTINGS_DATA_KEY,
-    JSON.stringify({ ...current, [TEXT_ALIGNMENT_KEY]: alignment }),
+    JSON.stringify({ ...current, ...updates }),
   );
 }
 
@@ -52,13 +59,53 @@ export function Settings() {
     },
   );
 
+  const [lightThemeIndex, setLightThemeIndex] = React.useState<number>(() => {
+    const settings = getSettings();
+    const value = settings[LIGHT_THEME_KEY];
+    return typeof value === "number" ? value : 0;
+  });
+
+  const [darkThemeIndex, setDarkThemeIndex] = React.useState<number>(() => {
+    const settings = getSettings();
+    const value = settings[DARK_THEME_KEY];
+    return typeof value === "number" ? value : 0;
+  });
+
   const handleAlignmentChange = (
     _event: React.MouseEvent<HTMLElement>,
     newAlignment: TextAlignment | null,
   ) => {
     if (newAlignment !== null) {
       setTextAlignment(newAlignment);
-      saveSettings(newAlignment);
+      saveSettings({ [TEXT_ALIGNMENT_KEY]: newAlignment });
+      window.dispatchEvent(new Event("settings-changed"));
+    }
+  };
+
+  const handleLightThemeChange = (
+    _event: React.MouseEvent<HTMLElement>,
+    newIndex: number | null,
+  ) => {
+    if (newIndex !== null) {
+      setLightThemeIndex(newIndex);
+      saveSettings({ [LIGHT_THEME_KEY]: newIndex });
+      if (!isDarkMode) {
+        applyThemeVars(false, newIndex);
+      }
+      window.dispatchEvent(new Event("settings-changed"));
+    }
+  };
+
+  const handleDarkThemeChange = (
+    _event: React.MouseEvent<HTMLElement>,
+    newIndex: number | null,
+  ) => {
+    if (newIndex !== null) {
+      setDarkThemeIndex(newIndex);
+      saveSettings({ [DARK_THEME_KEY]: newIndex });
+      if (isDarkMode) {
+        applyThemeVars(true, newIndex);
+      }
       window.dispatchEvent(new Event("settings-changed"));
     }
   };
@@ -72,7 +119,7 @@ export function Settings() {
               display: "block",
               mb: 1,
               fontWeight: "bold",
-              color: isDarkMode ? "white" : "text.primary",
+              color: "var(--text)",
             }}
           >
             Text Alignment
@@ -83,21 +130,7 @@ export function Settings() {
             onChange={handleAlignmentChange}
             aria-label="text alignment"
             size="small"
-            sx={{
-              bgcolor: isDarkMode ? "#17272d" : "transparent",
-              border: isDarkMode ? "1px solid #edf1e8" : undefined,
-              "& .MuiToggleButton-root": {
-                color: isDarkMode ? "#edf1e8" : undefined,
-                border: isDarkMode ? "1px solid #edf1e8" : undefined,
-                "&.Mui-selected": {
-                  bgcolor: isDarkMode ? "#24313b" : undefined,
-                  color: isDarkMode ? "#edf1e8" : undefined,
-                },
-                "&:hover": {
-                  bgcolor: isDarkMode ? "#1f333d" : undefined,
-                },
-              },
-            }}
+            sx={toggleGroupSx(isDarkMode)}
           >
             <ToggleButton value="left" aria-label="left align">
               Left
@@ -110,7 +143,135 @@ export function Settings() {
             </ToggleButton>
           </ToggleButtonGroup>
         </Box>
+
+        <Box sx={{ mb: 3 }}>
+          <FormLabel
+            sx={{
+              display: "block",
+              mb: 1,
+              fontWeight: "bold",
+              color: "var(--text)",
+            }}
+          >
+            Light Mode Theme
+          </FormLabel>
+          <ToggleButtonGroup
+            value={lightThemeIndex}
+            exclusive
+            onChange={handleLightThemeChange}
+            aria-label="light mode theme"
+            size="small"
+            sx={toggleGroupSx(isDarkMode)}
+          >
+            {LIGHT_THEMES.map((theme, index) => (
+              <ToggleButton
+                key={theme.label}
+                value={index}
+                aria-label={theme.label}
+                title={theme.label}
+                sx={toggleButtonSx(isDarkMode)}
+              >
+                <Box
+                  component="span"
+                  aria-hidden="true"
+                  sx={{
+                    display: "inline-block",
+                    width: 14,
+                    height: 14,
+                    borderRadius: "50%",
+                    backgroundColor: theme.accent,
+                    border: "1px solid rgba(0,0,0,0.2)",
+                    mr: 0.75,
+                    verticalAlign: "middle",
+                  }}
+                />
+                {theme.label}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+        </Box>
+
+        <Box sx={{ mb: 3 }}>
+          <FormLabel
+            sx={{
+              display: "block",
+              mb: 1,
+              fontWeight: "bold",
+              color: "var(--text)",
+            }}
+          >
+            Dark Mode Theme
+          </FormLabel>
+          <ToggleButtonGroup
+            value={darkThemeIndex}
+            exclusive
+            onChange={handleDarkThemeChange}
+            aria-label="dark mode theme"
+            size="small"
+            sx={toggleGroupSx(isDarkMode)}
+          >
+            {DARK_THEMES.map((theme, index) => (
+              <ToggleButton
+                key={theme.label}
+                value={index}
+                aria-label={theme.label}
+                title={theme.label}
+                sx={toggleButtonSx(isDarkMode)}
+              >
+                <Box
+                  component="span"
+                  aria-hidden="true"
+                  sx={{
+                    display: "inline-block",
+                    width: 14,
+                    height: 14,
+                    borderRadius: "50%",
+                    backgroundColor: theme.accent,
+                    border: "1px solid rgba(0,0,0,0.2)",
+                    mr: 0.75,
+                    verticalAlign: "middle",
+                  }}
+                />
+                {theme.label}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+        </Box>
       </Box>
     </>
   );
+}
+
+function toggleGroupSx(isDarkMode: boolean) {
+  return {
+    flexWrap: "wrap",
+    bgcolor: isDarkMode ? "var(--surface)" : "transparent",
+    border: isDarkMode ? "1px solid var(--text)" : undefined,
+    "& .MuiToggleButton-root": {
+      color: "var(--text)",
+      border: isDarkMode ? "1px solid var(--text)" : undefined,
+      "&.Mui-selected": {
+        bgcolor: isDarkMode ? "var(--surface-muted)" : undefined,
+        color: "var(--text)",
+      },
+      "&:hover": {
+        bgcolor: isDarkMode ? "var(--surface-muted)" : undefined,
+      },
+    },
+  } as const;
+}
+
+function toggleButtonSx(isDarkMode: boolean) {
+  return {
+    textTransform: "none",
+    border: isDarkMode ? "1px solid var(--text)" : undefined,
+    color: "var(--text)",
+    "&.Mui-selected": {
+      bgcolor: isDarkMode ? "var(--surface-muted)" : undefined,
+      color: "var(--text)",
+    },
+    "&:hover": {
+      bgcolor: isDarkMode ? "var(--surface-muted)" : undefined,
+    },
+  } as const;
 }

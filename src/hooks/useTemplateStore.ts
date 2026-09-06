@@ -21,6 +21,8 @@ export const useTemplateStore = () => {
     return [];
   });
 
+  const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
+
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
   }, [groups]);
@@ -63,12 +65,13 @@ export const useTemplateStore = () => {
 
   const addGroup = () => {
     const newGroup: ButtonGroup = {
-      id: generateId("New Group"),
-      label: "New Group",
+      id: generateId(""),
+      label: "",
       template: "",
       fills: {},
     };
     setGroups((prev) => [...prev, newGroup]);
+    setEditingGroupId(newGroup.id);
   };
 
   const updateGroupFills = (
@@ -112,5 +115,8 @@ export const useTemplateStore = () => {
     importData,
     reorderGroups,
     clearAll,
+    editingGroupId,
+    setEditingGroupId,
+    clearEditingGroupId: () => setEditingGroupId(null),
   };
 };

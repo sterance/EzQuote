@@ -1,4 +1,5 @@
 import { Box, Typography, List, ListItem, ListItemText, Paper } from "@mui/material";
+import sampleTemplatesUrl from "../data/sample-templates.json?url";
 
 export function Help() {
   return (
@@ -6,7 +7,13 @@ export function Help() {
       <Typography variant="h4" gutterBottom>
         Welcome to EzQuote
       </Typography>
-      <Typography variant="body1">A tool that helps you create standardised customer responses. Think of it as a template builder for communication. You can create "templates" that contain placeholders, then fill those placeholders with specific details when generating quotes for customers.</Typography>
+      <Typography variant="body1">
+        A tool that helps you create standardised customer responses. Think of it as a template builder for communication. You can create "templates" that contain placeholders, then fill those placeholders with specific details when generating quotes for customers. If you would like to see an example,{" "}
+        <a href={sampleTemplatesUrl} download="sample-templates.json">
+          download the sample templates
+        </a>{" "}
+        and import them with the "Import Templates" button on the Templates page.
+      </Typography>
 
       <Paper sx={{ pt: 2, pl: 2, mb: 2 }} elevation={1}>
         <Typography variant="h5" gutterBottom>

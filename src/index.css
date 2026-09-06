@@ -2,8 +2,8 @@
   font:
     16px/1.5 "Trebuchet MS",
     sans-serif;
-  color: #24313b;
-  background: #dfe8e8;
+  color: var(--text);
+  background: var(--page-bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

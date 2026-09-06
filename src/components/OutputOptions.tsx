@@ -37,26 +37,9 @@ export default function OutputOptions({
   enabled,
   onChange,
 }: OutputOptionsProps) {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return document.documentElement.getAttribute("data-theme") === "dark";
-  });
-
   const [textAlignment, setTextAlignment] = useState<TextAlignment>(() => {
     return (getSettings()[TEXT_ALIGNMENT_KEY] as TextAlignment) || "center";
   });
-
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setIsDarkMode(
-        document.documentElement.getAttribute("data-theme") === "dark",
-      );
-    });
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     const sync = () => {
@@ -80,7 +63,6 @@ export default function OutputOptions({
     onChange(next);
   };
 
-  const labelColor = isDarkMode ? "white" : "inherit";
   return (
     <Box
       sx={{
@@ -118,7 +100,7 @@ export default function OutputOptions({
                 sx={{
                   textAlign: "center",
                   textTransform: "capitalize",
-                  color: labelColor,
+                  color: "var(--text)",
                 }}
               >
                 {tag}
@@ -140,8 +122,8 @@ export default function OutputOptions({
                   slotProps: {
                     paper: {
                       sx: {
-                        bgcolor: isDarkMode ? "#17272d" : "#fffdf8",
-                        color: isDarkMode ? "#edf1e8" : "#24313b",
+                        bgcolor: "var(--surface)",
+                        color: "var(--text)",
                       },
                     },
                   },
@@ -186,7 +168,7 @@ export default function OutputOptions({
               sx={{
                 textAlign: "center",
                 textTransform: "capitalize",
-                color: labelColor,
+                color: "var(--text)",
               }}
             >
               {tag}

@@ -223,7 +223,6 @@ h1 {
 .main-content .MuiTextField-root {
   margin: 0;
   width: 100%;
-  margin-bottom: 1rem;
 }
 
 .main-content .MuiOutlinedInput-root {
@@ -239,9 +238,7 @@ h1 {
   border-color: var(--accent);
 }
 
-.main-content
-  .MuiOutlinedInput-root.Mui-focused
-  .MuiOutlinedInput-notchedOutline {
+.main-content .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
   border-color: var(--accent);
 }
 
@@ -360,15 +357,11 @@ h1 {
   border-color: var(--border);
 }
 
-.confirmation-modal
-  .MuiOutlinedInput-root:hover
-  .MuiOutlinedInput-notchedOutline {
+.confirmation-modal .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
   border-color: var(--accent);
 }
 
-.confirmation-modal
-  .MuiOutlinedInput-root.Mui-focused
-  .MuiOutlinedInput-notchedOutline {
+.confirmation-modal .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
   border-color: var(--accent);
 }
 

@@ -6,9 +6,35 @@ import { Output } from "./pages/Output";
 import { Help } from "./pages/Help";
 import { Settings } from "./pages/Settings";
 import { Templates } from "./pages/Templates";
+import { applyThemeVars } from "./themeOptions";
 
 const DARK_MODE_KEY = "dark_mode";
 const ADVANCED_MODE_KEY = "advanced_mode";
+const SETTINGS_DATA_KEY = "settings_data";
+const LIGHT_THEME_KEY = "light_theme_index";
+const DARK_THEME_KEY = "dark_theme_index";
+
+function readInitialThemeIndices(): {
+  light: number;
+  dark: number;
+} {
+  try {
+    const raw = localStorage.getItem(SETTINGS_DATA_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return {
+      light:
+        typeof parsed?.[LIGHT_THEME_KEY] === "number"
+          ? parsed[LIGHT_THEME_KEY]
+          : 0,
+      dark:
+        typeof parsed?.[DARK_THEME_KEY] === "number"
+          ? parsed[DARK_THEME_KEY]
+          : 0,
+    };
+  } catch {
+    return { light: 0, dark: 0 };
+  }
+}
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
@@ -18,6 +44,8 @@ function App() {
         "data-theme",
         saved ? "dark" : "light",
       );
+      const { light, dark } = readInitialThemeIndices();
+      applyThemeVars(saved, saved ? dark : light);
       return saved;
     } catch {
       return false;
@@ -40,6 +68,8 @@ function App() {
       "data-theme",
       next ? "dark" : "light",
     );
+    const { light, dark } = readInitialThemeIndices();
+    applyThemeVars(next, next ? dark : light);
   };
 
   const toggleAdvancedMode = () => {

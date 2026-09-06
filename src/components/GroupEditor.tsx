@@ -1,14 +1,5 @@
-import React, { useState, useRef } from "react";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Paper,
-  Stack,
-  IconButton,
-  Divider,
-} from "@mui/material";
+import React, { useState, useRef, useEffect } from "react";
+import { Box, Button, TextField, Typography, Paper, Stack, IconButton, Divider } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DragHandleIcon from "@mui/icons-material/DragHandle";
 import { useSortable } from "@dnd-kit/sortable";
@@ -23,35 +14,50 @@ interface GroupEditorProps {
   deleteGroup: () => void;
   updateGroupFills: (fills: Record<string, string[]>) => void;
   confirmAction: (msg: string, action: () => void) => void;
+  editingGroupId: string | null;
+  onExitEdit: () => void;
 }
 
-export const GroupEditor: React.FC<GroupEditorProps> = ({
-  group,
-  updateGroup,
-  deleteGroup,
-  updateGroupFills,
-  confirmAction,
-}) => {
+export const GroupEditor: React.FC<GroupEditorProps> = ({ group, updateGroup, deleteGroup, updateGroupFills, confirmAction, editingGroupId, onExitEdit }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isInputOpen, setIsInputOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [labelError, setLabelError] = useState<string | null>(null);
+  const [templateError, setTemplateError] = useState<string | null>(null);
 
   const [editLabel, setEditLabel] = useState(group.label);
   const [editTemplate, setEditTemplate] = useState(group.template);
-  const templateRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(
-    null,
-  );
+  const templateRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
   const cursorPosRef = useRef<number | null>(null);
+  const labelRef = useRef<HTMLInputElement | null>(null);
+  const autoEnteredRef = useRef(false);
+  const shouldFocusLabelRef = useRef(false);
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: group.id });
+  useEffect(() => {
+    if (editingGroupId === group.id && !autoEnteredRef.current) {
+      autoEnteredRef.current = true;
+      setEditLabel(group.label);
+      setEditTemplate(group.template);
+      shouldFocusLabelRef.current = true;
+      setIsEditing(true);
+    }
+  }, [editingGroupId, group.id, group.label, group.template]);
+
+  useEffect(() => {
+    if (isEditing && shouldFocusLabelRef.current) {
+      shouldFocusLabelRef.current = false;
+      const id = setTimeout(() => {
+        const el = labelRef.current;
+        if (el) {
+          el.focus();
+        }
+      }, 0);
+      return () => clearTimeout(id);
+    }
+  }, [isEditing]);
+
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: group.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -60,25 +66,38 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
   };
 
   const handleSave = () => {
+    const trimmedLabel = editLabel.trim();
+    const trimmedTemplate = editTemplate.trim();
+
+    const newLabelError = trimmedLabel ? null : "Group name is required";
+    const newTemplateError = trimmedTemplate ? null : "Template text is required";
+    setLabelError(newLabelError);
+    setTemplateError(newTemplateError);
+
+    if (newLabelError || newTemplateError) {
+      return;
+    }
+
     const oldTags = extractTags(group.template);
     const newTags = extractTags(editTemplate);
     const removedTags = oldTags.filter((t) => !newTags.includes(t));
 
-    const hasFills = Object.values(group.fills || {}).some(
-      (list) => list.length > 0,
-    );
+    const hasFills = Object.values(group.fills || {}).some((list) => list.length > 0);
 
     if (removedTags.length > 0 && hasFills) {
-      confirmAction(
-        `Saving will remove the following variable(s) and their fill values: "${removedTags.join(", ")}". Continue?`,
-        () => {
-          updateGroup(group.id, editLabel, editTemplate);
-          setIsEditing(false);
-        },
-      );
+      confirmAction(`Saving will remove the following variable(s) and their fill values: "${removedTags.join(", ")}". Continue?`, () => {
+        updateGroup(group.id, editLabel, editTemplate);
+        setIsEditing(false);
+        setLabelError(null);
+        setTemplateError(null);
+        onExitEdit();
+      });
     } else {
       updateGroup(group.id, editLabel, editTemplate);
       setIsEditing(false);
+      setLabelError(null);
+      setTemplateError(null);
+      onExitEdit();
     }
   };
 
@@ -104,10 +123,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
   const handleDeleteValue = (tag: string, index: number) => {
     const list = (group.fills || {})[tag] ?? [];
     if (list[index]) {
-      confirmAction(
-        `Are you sure you want to delete this "${tag}" fill value?`,
-        () => commitDeleteValue(tag, index),
-      );
+      confirmAction(`Are you sure you want to delete this "${tag}" fill value?`, () => commitDeleteValue(tag, index));
       return;
     }
     commitDeleteValue(tag, index);
@@ -124,12 +140,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
 
   return (
     <>
-      <Paper
-        ref={setNodeRef}
-        className="tmpl-card"
-        style={style}
-        sx={{ overflow: "hidden" }}
-      >
+      <Paper ref={setNodeRef} className="tmpl-card" style={style} sx={{ overflow: "hidden" }}>
         <Box
           sx={{
             bgcolor: "var(--surface)",
@@ -149,9 +160,15 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
               <TextField
                 fullWidth
                 value={editLabel}
-                onChange={(e) => setEditLabel(e.target.value)}
+                onChange={(e) => {
+                  setEditLabel(e.target.value);
+                  if (labelError) setLabelError(null);
+                }}
                 placeholder="Group Label"
                 size="small"
+                inputRef={labelRef}
+                error={!!labelError}
+                helperText={labelError || ""}
               />
               <Box
                 sx={{
@@ -163,10 +180,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
                 <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                   Template
                 </Typography>
-                <Typography>[text explaining how templates work]</Typography>
-                <Button onClick={() => setIsInputOpen(true)}>
-                  Insert Variable
-                </Button>
+                <Button onClick={() => setIsInputOpen(true)}>Insert Variable</Button>
               </Box>
               <TextField
                 fullWidth
@@ -175,32 +189,24 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
                 value={editTemplate}
                 onChange={(e) => {
                   setEditTemplate(e.target.value);
+                  if (templateError) setTemplateError(null);
                   cursorPosRef.current = e.target.selectionStart;
                 }}
                 onClick={(e) => {
-                  cursorPosRef.current = (
-                    e.target as HTMLInputElement | HTMLTextAreaElement
-                  ).selectionStart;
+                  cursorPosRef.current = (e.target as HTMLInputElement | HTMLTextAreaElement).selectionStart;
                 }}
                 onKeyUp={(e) => {
-                  cursorPosRef.current = (
-                    e.target as HTMLInputElement | HTMLTextAreaElement
-                  ).selectionStart;
+                  cursorPosRef.current = (e.target as HTMLInputElement | HTMLTextAreaElement).selectionStart;
                 }}
-                inputRef={(
-                  el: HTMLInputElement | HTMLTextAreaElement | null,
-                ) => {
+                inputRef={(el: HTMLInputElement | HTMLTextAreaElement | null) => {
                   templateRef.current = el;
                 }}
                 placeholder="Template text e.g. Hello {name}"
+                error={!!templateError}
+                helperText={templateError || ""}
               />
               <Stack direction="row" spacing={1}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  onClick={handleSave}
-                >
+                <Button variant="contained" color="primary" size="small" onClick={handleSave}>
                   Save
                 </Button>
                 <Button
@@ -210,6 +216,9 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
                     setEditLabel(group.label);
                     setEditTemplate(group.template);
                     setIsEditing(false);
+                    setLabelError(null);
+                    setTemplateError(null);
+                    onExitEdit();
                   }}
                 >
                   Cancel
@@ -226,18 +235,10 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
                 rowGap: 1,
               }}
             >
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: "bold", cursor: "pointer" }}
-                onClick={() => setIsExpanded(!isExpanded)}
-              >
+              <Typography variant="h6" sx={{ fontWeight: "bold", cursor: "pointer" }} onClick={() => setIsExpanded(!isExpanded)}>
                 {group.label}
               </Typography>
-              <Stack
-                direction="row"
-                spacing={1}
-                sx={{ alignItems: "center", justifyContent: "flex-end" }}
-              >
+              <Stack direction="row" spacing={1} sx={{ alignItems: "center", justifyContent: "flex-end" }}>
                 <IconButton
                   size="small"
                   onClick={() => setIsExpanded(!isExpanded)}
@@ -246,14 +247,17 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
                     transition: "transform 0.3s",
                   }}
                 >
-                  <Typography sx={{ fontSize: "1.5rem", lineHeight: 1 }}>
-                    ‹
-                  </Typography>
+                  <Typography sx={{ fontSize: "1.5rem", lineHeight: 1 }}>‹</Typography>
                 </IconButton>
                 <Button
                   variant="outlined"
                   size="small"
-                  onClick={() => setIsEditing(true)}
+                  onClick={() => {
+                    setIsEditing(true);
+                    setLabelError(null);
+                    setTemplateError(null);
+                    onExitEdit();
+                  }}
                 >
                   Edit
                 </Button>
@@ -274,12 +278,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
               >
                 {group.template}
               </Typography>
-              <IconButton
-                size="small"
-                {...attributes}
-                {...listeners}
-                sx={{ cursor: "grab", color: "text.secondary" }}
-              >
+              <IconButton size="small" {...attributes} {...listeners} sx={{ cursor: "grab", color: "text.secondary" }}>
                 <DragHandleIcon />
               </IconButton>
             </Box>
@@ -301,8 +300,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
           >
             {groupTags.length === 0 ? (
               <Typography variant="caption" color="text.secondary">
-                No variables in this template yet. Add {"{tag}"} placeholders
-                using "Insert Variable" in Edit mode.
+                No variables in this template yet. Add {"{tag}"} placeholders using "Insert Variable" in Edit mode.
               </Typography>
             ) : (
               groupTags.map((tag) => {
@@ -322,10 +320,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
                       gap: 1,
                     }}
                   >
-                    <Typography
-                      variant="subtitle2"
-                      sx={{ fontWeight: "bold", textTransform: "capitalize" }}
-                    >
+                    <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "capitalize" }}>
                       {tag}
                     </Typography>
                     <Divider />
@@ -335,31 +330,12 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
                       </Typography>
                     ) : (
                       list.map((value, idx) => (
-                        <Box
-                          key={idx}
-                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                        >
-                          <Typography
-                            variant="caption"
-                            sx={{ minWidth: 24, color: "text.secondary" }}
-                          >
+                        <Box key={idx} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <Typography variant="caption" sx={{ minWidth: 24, color: "text.secondary" }}>
                             {idx + 1}.
                           </Typography>
-                          <TextField
-                            fullWidth
-                            size="small"
-                            value={value}
-                            onChange={(e) =>
-                              handleUpdateValue(tag, idx, e.target.value)
-                            }
-                            placeholder={`Value for ${tag}`}
-                          />
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => handleDeleteValue(tag, idx)}
-                            aria-label={`Delete ${tag} value`}
-                          >
+                          <TextField fullWidth size="small" value={value} onChange={(e) => handleUpdateValue(tag, idx, e.target.value)} placeholder={`Value for ${tag}`} />
+                          <IconButton size="small" color="error" onClick={() => handleDeleteValue(tag, idx)} aria-label={`Delete ${tag} value`}>
                             <DeleteIcon fontSize="small" />
                           </IconButton>
                         </Box>
@@ -391,8 +367,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
           if (!inputValue) return;
           const insert = `{${inputValue}}`;
           const pos = cursorPosRef.current ?? editTemplate.length;
-          const next =
-            editTemplate.slice(0, pos) + insert + editTemplate.slice(pos);
+          const next = editTemplate.slice(0, pos) + insert + editTemplate.slice(pos);
           setEditTemplate(next);
           setIsInputOpen(false);
           setInputValue("");
