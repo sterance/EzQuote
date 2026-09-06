@@ -1,74 +1,91 @@
+import { useId } from "react";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
-import { useId } from "react";
-import OutputButtons from "./OutputButtons";
+import Paper from "@mui/material/Paper";
+import type { SxProps } from "@mui/material";
+import type { Theme } from "@mui/material";
 
 interface OutputGroupProps {
   label: string;
-  options: { id: string; label: string }[];
-  selectedId?: string;
-  onSelect: (id: string) => void;
   enabled: boolean;
   onToggleEnabled: (enabled: boolean) => void;
+  children?: React.ReactNode;
+  sx?: SxProps<Theme>;
 }
 
 export default function OutputGroup({
   label,
-  options,
-  selectedId,
-  onSelect,
   enabled,
   onToggleEnabled,
+  children,
+  sx,
 }: OutputGroupProps) {
-  const buttonsId = useId();
-  const labelId = `${buttonsId}-label`;
-  const toggleId = `${buttonsId}-toggle`;
+  const groupId = useId();
 
   return (
-    <Box
+    <Paper
+      className="output-card"
       sx={{
+        overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        "& > *": {
-          m: 1,
-        },
+        alignItems: "stretch",
+        ...sx,
       }}
     >
       <Box
-        component="label"
-        htmlFor={toggleId}
         sx={{
+          bgcolor: "var(--surface-muted)",
+          p: 2,
           display: "flex",
+          flexDirection: "column",
+          gap: 1,
           alignItems: "center",
-          cursor: "pointer",
-          opacity: enabled ? 1 : 0.55,
         }}
       >
-        <Checkbox
-          id={toggleId}
-          size="small"
-          checked={enabled}
-          onChange={(event) => onToggleEnabled(event.target.checked)}
-          sx={{ p: 0.5 }}
-        />
         <Box
-          component="span"
-          id={labelId}
-          className="button-group-label"
-          sx={{ m: 0, alignSelf: "center" }}
+          component="label"
+          htmlFor={`checkbox-${groupId}`}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            cursor: "pointer",
+            opacity: enabled ? 1 : 0.55,
+          }}
         >
-          {label}
+          <Checkbox
+            id={`checkbox-${groupId}`}
+            size="small"
+            checked={enabled}
+            onChange={(event) => onToggleEnabled(event.target.checked)}
+            sx={{ p: 0.5 }}
+          />
+          <Box
+            component="span"
+            id={`label-${groupId}`}
+            className="button-group-label"
+            sx={{ m: 0, alignSelf: "center" }}
+          >
+            {label}
+          </Box>
         </Box>
       </Box>
-      <OutputButtons
-        options={options}
-        selectedId={selectedId}
-        onSelect={onSelect}
-        enabled={enabled}
-        labelId={labelId}
-        buttonsId={buttonsId}
-      />
-    </Box>
+      {children && (
+        <Box
+          sx={{
+            p: 2,
+            bgcolor: "var(--surface-muted)",
+            display: "flex",
+            flexDirection: "row",
+            width: "100%",
+            boxSizing: "border-box",
+            justifyContent: "center",
+            gap: 2,
+          }}
+        >
+          {children}
+        </Box>
+      )}
+    </Paper>
   );
 }

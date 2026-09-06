@@ -19,13 +19,13 @@ export const extractTags = (template: string): string[] => {
   return tags;
 };
 
-export const syncChildFills = (
-  currentFills: Record<string, string>,
+export const syncGroupFills = (
+  currentFills: Record<string, string[]>,
   newTags: string[],
-): Record<string, string> => {
-  const syncedFills: Record<string, string> = {};
-  newTags.forEach((tag) => {
-    syncedFills[tag] = currentFills[tag] || "";
-  });
+): Record<string, string[]> => {
+  const syncedFills: Record<string, string[]> = {};
+  for (const tag of newTags) {
+    syncedFills[tag] = currentFills[tag] ?? [];
+  }
   return syncedFills;
 };

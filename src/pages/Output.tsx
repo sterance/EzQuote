@@ -2,19 +2,20 @@ import { Alert, Box, Button, Snackbar } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useTemplateStore } from "../hooks/useTemplateStore";
 import OutputGroup from "../components/OutputGroup";
-import FillableGroup from "../components/FillableGroup";
+import OutputOptions from "../components/OutputOptions";
 import Textbox from "../components/Textbox";
 import { extractTags } from "../utils/templateUtils";
+import { formatSelections } from "../utils/textFormatting";
 import { ConfirmationModal } from "../components/ConfirmationModal";
 import AdjustIcon from "@mui/icons-material/Adjust";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 
 const STORAGE_KEY = "output_data";
 
-function fillTemplate(template: string, fills: Record<string, string>) {
+function fillTemplate(template: string, fills: Record<string, string[]>) {
   return template.replace(
     /\{(\w+)\}/g,
-    (_, key: string) => fills[key] ?? `{${key}}`,
+    (_, key: string) => formatSelections(fills[key] ?? []),
   );
 }
 
@@ -26,18 +27,6 @@ export function Output({
   onToggleAdvancedMode: () => void;
 }) {
   const { groups } = useTemplateStore();
-  const [selections, setSelections] = useState<Record<string, string>>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return parsed.selections ?? {};
-      } catch {
-        console.error("Failed to parse local storage data.");
-      }
-    }
-    return {};
-  });
   const [enabledGroups, setEnabledGroups] = useState<Record<string, boolean>>(
     () => {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -53,7 +42,7 @@ export function Output({
     },
   );
   const [textFills, setTextFills] = useState<
-    Record<string, Record<string, string>>
+    Record<string, Record<string, string[]>>
   >(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -70,23 +59,12 @@ export function Output({
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ selections, enabledGroups, textFills }),
+      JSON.stringify({ enabledGroups, textFills }),
     );
-  }, [selections, enabledGroups, textFills]);
-
-  const handleSelect = (groupId: string, optionId: string) => {
-    setSelections((current) => ({ ...current, [groupId]: optionId }));
-  };
+  }, [enabledGroups, textFills]);
 
   const handleToggleGroup = (groupId: string, enabled: boolean) => {
     setEnabledGroups((current) => ({ ...current, [groupId]: enabled }));
-  };
-
-  const handleTextChange = (groupId: string, tag: string, value: string) => {
-    setTextFills((current) => ({
-      ...current,
-      [groupId]: { ...(current[groupId] ?? {}), [tag]: value },
-    }));
   };
 
   const output = useMemo(() => {
@@ -94,34 +72,27 @@ export function Output({
       .map((group) => {
         if (!enabledGroups[group.id]) return null;
 
-        if (group.options.length === 0) {
-          const tags = extractTags(group.template);
-          if (tags.length === 0) {
-            return group.template;
-          }
-          const fills: Record<string, string> = {};
-          const groupFills = textFills[group.id] ?? {};
-          for (const tag of tags) {
-            fills[tag] = groupFills[tag] ?? "";
-          }
-          return fillTemplate(group.template, fills);
+        const tags = extractTags(group.template);
+        if (tags.length === 0) {
+          return group.template;
         }
-
-        const selectedOptionId = selections[group.id];
-        const option = group.options.find((o) => o.id === selectedOptionId);
-        return option ? fillTemplate(group.template, option.fills) : null;
+        const fills: Record<string, string[]> = {};
+        const groupFills = textFills[group.id] ?? {};
+        for (const tag of tags) {
+          fills[tag] = groupFills[tag] ?? [];
+        }
+        return fillTemplate(group.template, fills);
       })
       .filter((line): line is string => Boolean(line))
       .join("\n\n");
-  }, [selections, enabledGroups, groups, textFills]);
+  }, [enabledGroups, groups, textFills]);
 
   const hasDataToClear = useMemo(() => {
     return (
       Object.values(enabledGroups).some(Boolean) ||
-      Object.keys(selections).length > 0 ||
       Object.keys(textFills).length > 0
     );
-  }, [selections, enabledGroups, textFills]);
+  }, [enabledGroups, textFills]);
 
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -162,25 +133,38 @@ export function Output({
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
 
   const handleClearAll = () => {
-    setSelections({});
     setEnabledGroups({});
     setTextFills({});
   };
 
   return (
     <>
-      <Box className="button-sections" sx={{ position: "relative" }}>
-<Button
-           variant="outlined"
-           color="error"
-           size="small"
-           onClick={onToggleAdvancedMode}
-           className="advanced-btn"
-           startIcon={advancedMode ? <RocketLaunchIcon /> : <AdjustIcon />}
-           sx={{ position: "absolute", top: 8, left: 8, zIndex: 1 }}
-         >
-           {advancedMode ? "Advanced Mode" : "Simple Mode"}
-         </Button>
+      <Box
+        className="button-sections"
+        sx={{
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
+        <Button
+          variant="outlined"
+          color="error"
+          size="small"
+          onClick={onToggleAdvancedMode}
+          className="advanced-btn"
+          startIcon={advancedMode ? <RocketLaunchIcon /> : <AdjustIcon />}
+          sx={{
+            position: "absolute",
+            top: 8,
+            left: 8,
+            zIndex: 1,
+            display: "none", // button disabled until simple/advanced functionality implemented, remove this line to re-enable
+          }}
+        >
+          {advancedMode ? "Advanced Mode" : "Simple Mode"}
+        </Button>
         <Button
           variant="outlined"
           color="error"
@@ -192,33 +176,51 @@ export function Output({
         >
           Clear All
         </Button>
-        {groups.map((group) =>
-          group.options.length === 0 ? (
-            <FillableGroup
-              key={group.id}
-              label={group.label}
-              template={group.template}
-              value={textFills[group.id] ?? {}}
-              enabled={Boolean(enabledGroups[group.id])}
-              onChange={(tag, value) => handleTextChange(group.id, tag, value)}
-              onToggleEnabled={(enabled) =>
-                handleToggleGroup(group.id, enabled)
-              }
-            />
-          ) : (
+        {groups.map((group, index) => {
+          const tags = extractTags(group.template);
+          const hasTags = tags.length > 0;
+
+          if (!hasTags) {
+            // State 1: No tags → checkbox only, no child components
+            return (
+              <OutputGroup
+                key={group.id}
+                label={group.label}
+                enabled={Boolean(enabledGroups[group.id])}
+                onToggleEnabled={(enabled) =>
+                  handleToggleGroup(group.id, enabled)
+                }
+                sx={{ mt: index === 0 ? 6 : 0 }}
+              />
+            );
+          }
+
+          // States 2-4: Has tags → checkbox + Options (handles dropdowns + text fields)
+          return (
             <OutputGroup
               key={group.id}
               label={group.label}
-              options={group.options.map(({ id, label }) => ({ id: id as string, label: label as string }))}
-              selectedId={selections[group.id]}
-              onSelect={(optionId: string) => handleSelect(group.id, optionId)}
               enabled={Boolean(enabledGroups[group.id])}
-              onToggleEnabled={(enabled: boolean) =>
+              onToggleEnabled={(enabled) =>
                 handleToggleGroup(group.id, enabled)
               }
-            />
-          ),
-        )}
+              sx={{ mt: index === 0 ? 4 : 0 }}
+            >
+              <OutputOptions
+                fills={group.fills || {}}
+                template={group.template}
+                textFills={textFills[group.id] ?? {}}
+                enabled={Boolean(enabledGroups[group.id])}
+                onChange={(fills) =>
+                  setTextFills((current) => ({
+                    ...current,
+                    [group.id]: fills,
+                  }))
+                }
+              />
+            </OutputGroup>
+          );
+        })}
       </Box>
 
       <Textbox label="Output" placeholder="" value={output} />

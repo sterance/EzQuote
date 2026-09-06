@@ -7,26 +7,21 @@ import {
   Paper,
   Stack,
   IconButton,
+  Divider,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import DragHandleIcon from "@mui/icons-material/DragHandle";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { extractTags } from "../utils/templateUtils";
 import type { ButtonGroup } from "../types";
-import { ChildEditor } from "./ChildEditor";
 import { InputModal } from "./InputModal";
 
 interface GroupEditorProps {
   group: ButtonGroup;
   updateGroup: (id: string, label: string, template: string) => void;
   deleteGroup: () => void;
-  addChild: () => void;
-  updateChild: (
-    id: string,
-    label: string,
-    fills: Record<string, string>,
-  ) => void;
-  deleteChild: (id: string) => void;
+  updateGroupFills: (fills: Record<string, string[]>) => void;
   confirmAction: (msg: string, action: () => void) => void;
 }
 
@@ -34,9 +29,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
   group,
   updateGroup,
   deleteGroup,
-  addChild,
-  updateChild,
-  deleteChild,
+  updateGroupFills,
   confirmAction,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -71,9 +64,13 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
     const newTags = extractTags(editTemplate);
     const removedTags = oldTags.filter((t) => !newTags.includes(t));
 
-    if (removedTags.length > 0 && group.options.length > 0) {
+    const hasFills = Object.values(group.fills || {}).some(
+      (list) => list.length > 0,
+    );
+
+    if (removedTags.length > 0 && hasFills) {
       confirmAction(
-        `Saving will remove the following option(s): "${removedTags.join(", ")}", and their data. Continue?`,
+        `Saving will remove the following variable(s) and their fill values: "${removedTags.join(", ")}". Continue?`,
         () => {
           updateGroup(group.id, editLabel, editTemplate);
           setIsEditing(false);
@@ -86,6 +83,44 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
   };
 
   const groupTags = extractTags(group.template);
+
+  const handleAddValue = (tag: string) => {
+    const next: Record<string, string[]> = {
+      ...(group.fills || {}),
+      [tag]: [...((group.fills || {})[tag] ?? []), ""],
+    };
+    updateGroupFills(next);
+  };
+
+  const handleUpdateValue = (tag: string, index: number, value: string) => {
+    const list = (group.fills || {})[tag] ?? [];
+    const next: Record<string, string[]> = {
+      ...(group.fills || {}),
+      [tag]: list.map((v, i) => (i === index ? value : v)),
+    };
+    updateGroupFills(next);
+  };
+
+  const handleDeleteValue = (tag: string, index: number) => {
+    const list = (group.fills || {})[tag] ?? [];
+    if (list[index]) {
+      confirmAction(
+        `Are you sure you want to delete this "${tag}" fill value?`,
+        () => commitDeleteValue(tag, index),
+      );
+      return;
+    }
+    commitDeleteValue(tag, index);
+  };
+
+  const commitDeleteValue = (tag: string, index: number) => {
+    const list = (group.fills || {})[tag] ?? [];
+    const next: Record<string, string[]> = {
+      ...(group.fills || {}),
+      [tag]: list.filter((_, i) => i !== index),
+    };
+    updateGroupFills(next);
+  };
 
   return (
     <>
@@ -257,37 +292,94 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
               p: 2,
               bgcolor: "var(--surface-muted)",
               display: "flex",
-              flexDirection: "column",
+              flexDirection: "row",
+              width: "100%",
+              boxSizing: "border-box",
+              justifyContent: "space-between",
               gap: 2,
             }}
           >
-            <Typography>
-              [text explaining how to use the options section]
-            </Typography>
-            {group.options.map((child) => (
-              <ChildEditor
-                key={child.id}
-                child={child}
-                tags={groupTags}
-                onSave={(label, fills) => updateChild(child.id, label, fills)}
-                onDelete={() => deleteChild(child.id)}
-                confirmAction={confirmAction}
-              />
-            ))}
-
-            <Button
-              fullWidth
-              variant="outlined"
-              sx={{
-                borderStyle: "dashed",
-                py: 1.5,
-                color: "text.secondary",
-                "&:hover": { bgcolor: "action.hover", color: "text.primary" },
-              }}
-              onClick={addChild}
-            >
-              + Add Option
-            </Button>
+            {groupTags.length === 0 ? (
+              <Typography variant="caption" color="text.secondary">
+                No variables in this template yet. Add {"{tag}"} placeholders
+                using "Insert Variable" in Edit mode.
+              </Typography>
+            ) : (
+              groupTags.map((tag) => {
+                const list = (group.fills || {})[tag] ?? [];
+                return (
+                  <Box
+                    key={tag}
+                    sx={{
+                      flex: 1,
+                      p: 1.5,
+                      border: 1,
+                      borderColor: "var(--border)",
+                      borderRadius: 1,
+                      bgcolor: "var(--surface)",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 1,
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ fontWeight: "bold", textTransform: "capitalize" }}
+                    >
+                      {tag}
+                    </Typography>
+                    <Divider />
+                    {list.length === 0 ? (
+                      <Typography variant="caption" color="text.secondary">
+                        No fill values yet.
+                      </Typography>
+                    ) : (
+                      list.map((value, idx) => (
+                        <Box
+                          key={idx}
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          <Typography
+                            variant="caption"
+                            sx={{ minWidth: 24, color: "text.secondary" }}
+                          >
+                            {idx + 1}.
+                          </Typography>
+                          <TextField
+                            fullWidth
+                            size="small"
+                            value={value}
+                            onChange={(e) =>
+                              handleUpdateValue(tag, idx, e.target.value)
+                            }
+                            placeholder={`Value for ${tag}`}
+                          />
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleDeleteValue(tag, idx)}
+                            aria-label={`Delete ${tag} value`}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      ))
+                    )}
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        alignSelf: "center",
+                        borderStyle: "dashed",
+                      }}
+                      onClick={() => handleAddValue(tag)}
+                    >
+                      + Add Value
+                    </Button>
+                  </Box>
+                );
+              })
+            )}
           </Box>
         )}
       </Paper>

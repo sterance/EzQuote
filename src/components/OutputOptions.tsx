@@ -1,0 +1,208 @@
+import Box from "@mui/material/Box";
+import Checkbox from "@mui/material/Checkbox";
+import FormControl from "@mui/material/FormControl";
+import ListItemText from "@mui/material/ListItemText";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import { useMemo, useState, useEffect } from "react";
+import { extractTags } from "../utils/templateUtils";
+
+const SETTINGS_DATA_KEY = "settings_data";
+const TEXT_ALIGNMENT_KEY = "text_alignment";
+type TextAlignment = "left" | "center" | "right";
+
+function getSettings(): Record<string, unknown> {
+  try {
+    const saved = localStorage.getItem(SETTINGS_DATA_KEY);
+    return saved ? JSON.parse(saved) : {};
+  } catch {
+    return {};
+  }
+}
+
+interface OutputOptionsProps {
+  fills: Record<string, string[]>;
+  template: string;
+  textFills?: Record<string, string[]>;
+  enabled: boolean;
+  onChange: (fills: Record<string, string[]>) => void;
+}
+
+export default function OutputOptions({
+  fills,
+  template,
+  textFills = {},
+  enabled,
+  onChange,
+}: OutputOptionsProps) {
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return document.documentElement.getAttribute("data-theme") === "dark";
+  });
+
+  const [textAlignment, setTextAlignment] = useState<TextAlignment>(() => {
+    return (getSettings()[TEXT_ALIGNMENT_KEY] as TextAlignment) || "center";
+  });
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDarkMode(
+        document.documentElement.getAttribute("data-theme") === "dark",
+      );
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const sync = () => {
+      setTextAlignment(
+        (getSettings()[TEXT_ALIGNMENT_KEY] as TextAlignment) || "center",
+      );
+    };
+    window.addEventListener("storage", sync);
+    window.addEventListener("settings-changed", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("settings-changed", sync);
+    };
+  }, []);
+
+  const tags = useMemo(() => extractTags(template), [template]);
+
+  const handleChange = (tag: string, value: string[]) => {
+    const currentFills = textFills || {};
+    const next = { ...currentFills, [tag]: value };
+    onChange(next);
+  };
+
+  const labelColor = isDarkMode ? "white" : "inherit";
+  return (
+    <Box
+      sx={{
+        width: "90%",
+        opacity: enabled ? 1 : 0.55,
+        transition: "opacity 150ms ease",
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 1,
+      }}
+    >
+      {tags.map((tag) => {
+        const hasTemplateFills = (fills[tag]?.length || 0) > 0;
+
+        if (hasTemplateFills) {
+          const list = fills[tag];
+          const selectId = `dropdown-${tag}`;
+          const selectedValues = textFills?.[tag] ?? [];
+
+          const displayValue = (() => {
+            if (selectedValues.length === 0) return "";
+            if (selectedValues.length === 1) return selectedValues[0];
+            return `${selectedValues[0]} +${selectedValues.length - 1}`;
+          })();
+
+          return (
+            <FormControl
+              key={tag}
+              size="small"
+              sx={{ flex: "1 1 200px", minWidth: 120 }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  textAlign: "center",
+                  textTransform: "capitalize",
+                  color: labelColor,
+                }}
+              >
+                {tag}
+              </Typography>
+              <Select
+                id={selectId}
+                multiple
+                value={selectedValues}
+                onChange={(e) => handleChange(tag, e.target.value as string[])}
+                displayEmpty
+                disabled={!enabled}
+                renderValue={() => (
+                  <Typography sx={{ textAlign: textAlignment }}>
+                    {displayValue}
+                  </Typography>
+                )}
+                sx={{ textAlign: textAlignment }}
+                MenuProps={{
+                  slotProps: {
+                    paper: {
+                      sx: {
+                        bgcolor: isDarkMode ? "#17272d" : "#fffdf8",
+                        color: isDarkMode ? "#edf1e8" : "#24313b",
+                      },
+                    },
+                  },
+                }}
+              >
+                {list.map((val) => (
+                  <MenuItem key={val} value={val}>
+                    <Checkbox
+                      checked={selectedValues.includes(val)}
+                      sx={{ p: 0.5 }}
+                    />
+                    <ListItemText
+                      sx={{
+                        display: "flex",
+                        flex: 1,
+                        m: 0,
+                      }}
+                      primary={
+                        <Typography
+                          component="span"
+                          sx={{ textAlign: textAlignment, width: "100%" }}
+                        >
+                          {val}
+                        </Typography>
+                      }
+                    />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          );
+        }
+
+        return (
+          <FormControl
+            key={tag}
+            size="small"
+            sx={{ flex: "1 1 200px", minWidth: 120 }}
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                textAlign: "center",
+                textTransform: "capitalize",
+                color: labelColor,
+              }}
+            >
+              {tag}
+            </Typography>
+            <TextField
+              value={textFills?.[tag]?.[0] ?? ""}
+              onChange={(event) =>
+                handleChange(tag, event.target.value ? [event.target.value] : [])
+              }
+              size="small"
+              disabled={!enabled}
+              slotProps={{ htmlInput: { style: { textAlign: textAlignment } } }}
+            />
+          </FormControl>
+        );
+      })}
+    </Box>
+  );
+}

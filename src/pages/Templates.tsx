@@ -22,9 +22,7 @@ export const Templates: React.FC = () => {
     updateGroup,
     deleteGroup,
     addGroup,
-    updateChild,
-    deleteChild,
-    addChild,
+    updateGroupFills,
     importData,
     reorderGroups,
     clearAll,
@@ -115,11 +113,9 @@ export const Templates: React.FC = () => {
                     () => deleteGroup(group.id),
                   )
                 }
-                addChild={() => addChild(group.id)}
-                updateChild={(childId, label, fills) =>
-                  updateChild(group.id, childId, label, fills)
+                updateGroupFills={(fills) =>
+                  updateGroupFills(group.id, fills)
                 }
-                deleteChild={(childId) => deleteChild(group.id, childId)}
                 confirmAction={confirmAction}
               />
             ))}
