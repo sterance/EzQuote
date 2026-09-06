@@ -62,7 +62,7 @@
       ],
       "icon": "build/icon.ico",
       "signtoolOptions": {
-        "sign": "./build/win-sign.js"
+        "sign": "./build/win-sign.cjs"
       }
     },
     "portable": {
