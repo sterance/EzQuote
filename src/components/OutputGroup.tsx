@@ -13,13 +13,7 @@ interface OutputGroupProps {
   sx?: SxProps<Theme>;
 }
 
-export default function OutputGroup({
-  label,
-  enabled,
-  onToggleEnabled,
-  children,
-  sx,
-}: OutputGroupProps) {
+export default function OutputGroup({ label, enabled, onToggleEnabled, children, sx }: OutputGroupProps) {
   const groupId = useId();
 
   return (
@@ -36,7 +30,7 @@ export default function OutputGroup({
       <Box
         sx={{
           bgcolor: "var(--surface-muted)",
-          p: 2,
+          py: 1,
           display: "flex",
           flexDirection: "column",
           gap: 1,
@@ -53,19 +47,8 @@ export default function OutputGroup({
             opacity: enabled ? 1 : 0.55,
           }}
         >
-          <Checkbox
-            id={`checkbox-${groupId}`}
-            size="small"
-            checked={enabled}
-            onChange={(event) => onToggleEnabled(event.target.checked)}
-            sx={{ p: 0.5 }}
-          />
-          <Box
-            component="span"
-            id={`label-${groupId}`}
-            className="button-group-label"
-            sx={{ m: 0, alignSelf: "center" }}
-          >
+          <Checkbox id={`checkbox-${groupId}`} size="small" checked={enabled} onChange={(event) => onToggleEnabled(event.target.checked)} sx={{ p: 0.5 }} />
+          <Box component="span" id={`label-${groupId}`} className="button-group-label" sx={{ m: 0, alignSelf: "center" }}>
             {label}
           </Box>
         </Box>
@@ -73,7 +56,7 @@ export default function OutputGroup({
       {children && (
         <Box
           sx={{
-            p: 2,
+            pb: 2,
             bgcolor: "var(--surface-muted)",
             display: "flex",
             flexDirection: "row",

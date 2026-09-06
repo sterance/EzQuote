@@ -30,22 +30,14 @@ interface OutputOptionsProps {
   onChange: (fills: Record<string, string[]>) => void;
 }
 
-export default function OutputOptions({
-  fills,
-  template,
-  textFills = {},
-  enabled,
-  onChange,
-}: OutputOptionsProps) {
+export default function OutputOptions({ fills, template, textFills = {}, enabled, onChange }: OutputOptionsProps) {
   const [textAlignment, setTextAlignment] = useState<TextAlignment>(() => {
     return (getSettings()[TEXT_ALIGNMENT_KEY] as TextAlignment) || "center";
   });
 
   useEffect(() => {
     const sync = () => {
-      setTextAlignment(
-        (getSettings()[TEXT_ALIGNMENT_KEY] as TextAlignment) || "center",
-      );
+      setTextAlignment((getSettings()[TEXT_ALIGNMENT_KEY] as TextAlignment) || "center");
     };
     window.addEventListener("storage", sync);
     window.addEventListener("settings-changed", sync);
@@ -90,11 +82,7 @@ export default function OutputOptions({
           })();
 
           return (
-            <FormControl
-              key={tag}
-              size="small"
-              sx={{ flex: "1 1 200px", minWidth: 120 }}
-            >
+            <FormControl key={tag} size="small" sx={{ flex: "1 1 200px", minWidth: 120 }}>
               <Typography
                 variant="h6"
                 sx={{
@@ -112,11 +100,7 @@ export default function OutputOptions({
                 onChange={(e) => handleChange(tag, e.target.value as string[])}
                 displayEmpty
                 disabled={!enabled}
-                renderValue={() => (
-                  <Typography sx={{ textAlign: textAlignment }}>
-                    {displayValue}
-                  </Typography>
-                )}
+                renderValue={() => <Typography sx={{ textAlign: textAlignment }}>{displayValue}</Typography>}
                 sx={{ textAlign: textAlignment }}
                 MenuProps={{
                   slotProps: {
@@ -131,10 +115,7 @@ export default function OutputOptions({
               >
                 {list.map((val) => (
                   <MenuItem key={val} value={val}>
-                    <Checkbox
-                      checked={selectedValues.includes(val)}
-                      sx={{ p: 0.5 }}
-                    />
+                    <Checkbox checked={selectedValues.includes(val)} sx={{ p: 0.5 }} />
                     <ListItemText
                       sx={{
                         display: "flex",
@@ -142,10 +123,7 @@ export default function OutputOptions({
                         m: 0,
                       }}
                       primary={
-                        <Typography
-                          component="span"
-                          sx={{ textAlign: textAlignment, width: "100%" }}
-                        >
+                        <Typography component="span" sx={{ textAlign: textAlignment, width: "100%" }}>
                           {val}
                         </Typography>
                       }
@@ -158,30 +136,19 @@ export default function OutputOptions({
         }
 
         return (
-          <FormControl
-            key={tag}
-            size="small"
-            sx={{ flex: "1 1 200px", minWidth: 120 }}
-          >
+          <FormControl key={tag} size="small" sx={{ flex: "1 1 200px", minWidth: 120 }}>
             <Typography
               variant="h6"
               sx={{
                 textAlign: "center",
                 textTransform: "capitalize",
                 color: "var(--text)",
+                fontSize: "1.2rem",
               }}
             >
               {tag}
             </Typography>
-            <TextField
-              value={textFills?.[tag]?.[0] ?? ""}
-              onChange={(event) =>
-                handleChange(tag, event.target.value ? [event.target.value] : [])
-              }
-              size="small"
-              disabled={!enabled}
-              slotProps={{ htmlInput: { style: { textAlign: textAlignment } } }}
-            />
+            <TextField value={textFills?.[tag]?.[0] ?? ""} onChange={(event) => handleChange(tag, event.target.value ? [event.target.value] : [])} size="small" disabled={!enabled} slotProps={{ htmlInput: { style: { textAlign: textAlignment } } }} />
           </FormControl>
         );
       })}

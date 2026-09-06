@@ -1,5 +1,6 @@
-import { Alert, Box, Button, Snackbar } from "@mui/material";
+import { Alert, Box, Button, Link, Snackbar } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
 import { useTemplateStore } from "../hooks/useTemplateStore";
 import OutputGroup from "../components/OutputGroup";
 import OutputOptions from "../components/OutputOptions";
@@ -13,37 +14,24 @@ import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 const STORAGE_KEY = "output_data";
 
 function fillTemplate(template: string, fills: Record<string, string[]>) {
-  return template.replace(
-    /\{(\w+)\}/g,
-    (_, key: string) => formatSelections(fills[key] ?? []),
-  );
+  return template.replace(/\{(\w+)\}/g, (_, key: string) => formatSelections(fills[key] ?? []));
 }
 
-export function Output({
-  advancedMode,
-  onToggleAdvancedMode,
-}: {
-  advancedMode: boolean;
-  onToggleAdvancedMode: () => void;
-}) {
+export function Output({ advancedMode, onToggleAdvancedMode }: { advancedMode: boolean; onToggleAdvancedMode: () => void }) {
   const { groups } = useTemplateStore();
-  const [enabledGroups, setEnabledGroups] = useState<Record<string, boolean>>(
-    () => {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          return parsed.enabledGroups ?? {};
-        } catch {
-          console.error("Failed to parse local storage data.");
-        }
+  const [enabledGroups, setEnabledGroups] = useState<Record<string, boolean>>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.enabledGroups ?? {};
+      } catch {
+        console.error("Failed to parse local storage data.");
       }
-      return {};
-    },
-  );
-  const [textFills, setTextFills] = useState<
-    Record<string, Record<string, string[]>>
-  >(() => {
+    }
+    return {};
+  });
+  const [textFills, setTextFills] = useState<Record<string, Record<string, string[]>>>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
@@ -57,10 +45,7 @@ export function Output({
   });
 
   useEffect(() => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ enabledGroups, textFills }),
-    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabledGroups, textFills }));
   }, [enabledGroups, textFills]);
 
   const handleToggleGroup = (groupId: string, enabled: boolean) => {
@@ -88,10 +73,7 @@ export function Output({
   }, [enabledGroups, groups, textFills]);
 
   const hasDataToClear = useMemo(() => {
-    return (
-      Object.values(enabledGroups).some(Boolean) ||
-      Object.keys(textFills).length > 0
-    );
+    return Object.values(enabledGroups).some(Boolean) || Object.keys(textFills).length > 0;
   }, [enabledGroups, textFills]);
 
   const [snackbar, setSnackbar] = useState<{
@@ -165,47 +147,30 @@ export function Output({
         >
           {advancedMode ? "Advanced Mode" : "Simple Mode"}
         </Button>
-        <Button
-          variant="outlined"
-          color="error"
-          size="small"
-          onClick={() => setClearConfirmOpen(true)}
-          disabled={!hasDataToClear}
-          className="clear-all-btn"
-          sx={{ position: "absolute", top: 8, right: 8, zIndex: 1 }}
-        >
+        <Button variant="outlined" color="error" size="small" onClick={() => setClearConfirmOpen(true)} disabled={!hasDataToClear} className="clear-all-btn" sx={{ position: "absolute", top: 8, right: 8, zIndex: 1 }}>
           Clear All
         </Button>
+        {groups.length === 0 && (
+          <Box sx={{ m: 0, textAlign: "center" }}>
+            No template groups exist. Create or import templates on the{" "}
+            <Link component={RouterLink} to="/templates">
+              Templates page
+            </Link>
+            .
+          </Box>
+        )}
         {groups.map((group, index) => {
           const tags = extractTags(group.template);
           const hasTags = tags.length > 0;
 
           if (!hasTags) {
             // State 1: No tags → checkbox only, no child components
-            return (
-              <OutputGroup
-                key={group.id}
-                label={group.label}
-                enabled={Boolean(enabledGroups[group.id])}
-                onToggleEnabled={(enabled) =>
-                  handleToggleGroup(group.id, enabled)
-                }
-                sx={{ mt: index === 0 ? 6 : 0 }}
-              />
-            );
+            return <OutputGroup key={group.id} label={group.label} enabled={Boolean(enabledGroups[group.id])} onToggleEnabled={(enabled) => handleToggleGroup(group.id, enabled)} sx={{ mt: index === 0 ? 6 : 0 }} />;
           }
 
           // States 2-4: Has tags → checkbox + Options (handles dropdowns + text fields)
           return (
-            <OutputGroup
-              key={group.id}
-              label={group.label}
-              enabled={Boolean(enabledGroups[group.id])}
-              onToggleEnabled={(enabled) =>
-                handleToggleGroup(group.id, enabled)
-              }
-              sx={{ mt: index === 0 ? 4 : 0 }}
-            >
+            <OutputGroup key={group.id} label={group.label} enabled={Boolean(enabledGroups[group.id])} onToggleEnabled={(enabled) => handleToggleGroup(group.id, enabled)} sx={{ mt: index === 0 ? 4 : 0 }}>
               <OutputOptions
                 fills={group.fills || {}}
                 template={group.template}
@@ -223,15 +188,9 @@ export function Output({
         })}
       </Box>
 
-      <Textbox label="Output" placeholder="" value={output} />
+      <Textbox label="Output" placeholder="Output will appear here once options are selected above." value={output} />
       <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <Button
-          className="copy-clipboard-btn"
-          variant="contained"
-          color="primary"
-          onClick={handleCopy}
-          disabled={!output}
-        >
+        <Button className="copy-clipboard-btn" variant="contained" color="primary" onClick={handleCopy} disabled={!output}>
           Copy to Clipboard
         </Button>
       </Box>
@@ -244,18 +203,8 @@ export function Output({
         }}
         onCancel={() => setClearConfirmOpen(false)}
       />
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
+      <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} variant="filled" sx={{ width: "100%" }}>
           {snackbar.message}
         </Alert>
       </Snackbar>

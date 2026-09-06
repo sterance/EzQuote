@@ -18,12 +18,19 @@ export default function Textbox({ label, placeholder, value }: TextboxProps) {
       <div>
         <TextField
           id="outlined-textarea"
-          label={label}
+          label={value?.trim() ? label : undefined}
           placeholder={placeholder}
           value={value ?? ""}
           multiline
           minRows={4}
-          slotProps={{ input: { readOnly: true } }}
+          slotProps={{
+            input: { readOnly: true },
+          }}
+          sx={{
+            "& .MuiInputBase-input::placeholder": {
+              opacity: 1,
+            },
+          }}
         />
       </div>
     </Box>
