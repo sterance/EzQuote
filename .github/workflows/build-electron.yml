@@ -27,8 +27,18 @@ jobs:
       - name: Build renderer (electron mode)
         run: npm run build:electron:renderer
 
+      - name: Cache electron-builder tools
+        uses: actions/cache@v6
+        with:
+          path: ${{ github.workspace }}\.cache\electron-builder
+          key: electron-builder-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            electron-builder-cache-${{ runner.os }}-
+
       - name: Package Windows executable
         run: npm run electron:pack
+        env:
+          ELECTRON_BUILDER_CACHE: ${{ github.workspace }}\.cache\electron-builder
 
       - name: Copy sample templates alongside executable
         run: Copy-Item -Path "src/data/sample-templates.json" -Destination "release/sample-templates.json"
