@@ -153,6 +153,7 @@ export const Templates: React.FC = () => {
         />
         <Button
           variant="contained"
+          className="template-action-btn"
           onClick={() =>
             groups.length > 0
               ? confirmAction(
@@ -164,7 +165,7 @@ export const Templates: React.FC = () => {
         >
           Import Templates
         </Button>
-        <Button variant="contained" onClick={handleExport}>
+        <Button variant="contained" className="template-action-btn" onClick={handleExport}>
           Export Templates
         </Button>
         <Button

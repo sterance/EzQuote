@@ -35,6 +35,12 @@
   background: var(--page-bg);
 }
 
+.main-content a,
+.main-content a:visited {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
 .top-nav {
   align-items: center;
   background: var(--nav-bg);
@@ -265,6 +271,17 @@ h1 {
   color: var(--text-muted);
   border-color: var(--border);
   background-color: var(--surface);
+}
+
+.main-content .copy-clipboard-btn,
+.main-content .template-action-btn {
+  background-color: var(--accent);
+}
+
+.main-content .copy-clipboard-btn:hover,
+.main-content .template-action-btn:hover {
+  background-color: var(--accent);
+  filter: brightness(0.9);
 }
 
 .app-shell[data-theme="dark"] .main-content .clear-all-btn:disabled {

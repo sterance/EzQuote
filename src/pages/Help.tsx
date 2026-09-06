@@ -138,7 +138,7 @@ export function Help() {
         </Typography>
         <List component="ol" sx={{ p: 0, listStyleType: "decimal", pl: 4 }}>
           <ListItem sx={{ display: "list-item", pl: 1 }}>
-            <ListItemText primary="On the Templates page, you'll see drag handles (six dots) next to each group name" />
+            <ListItemText primary="On the Templates page, you'll see drag handles (two horizontal lines) next to each group name" />
           </ListItem>
           <ListItem sx={{ display: "list-item", pl: 1 }}>
             <ListItemText primary="Click and drag to move groups up or down - this changes their order in the output" />
