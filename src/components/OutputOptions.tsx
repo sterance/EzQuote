@@ -1,5 +1,7 @@
 import Box from "@mui/material/Box";
+import Checkbox from "@mui/material/Checkbox";
 import FormControl from "@mui/material/FormControl";
+import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
@@ -23,9 +25,9 @@ function getSettings(): Record<string, unknown> {
 interface OutputOptionsProps {
   fills: Record<string, string[]>;
   template: string;
-  textFills?: Record<string, string>;
+  textFills?: Record<string, string[]>;
   enabled: boolean;
-  onChange: (fills: Record<string, string>) => void;
+  onChange: (fills: Record<string, string[]>) => void;
 }
 
 export default function OutputOptions({
@@ -72,7 +74,7 @@ export default function OutputOptions({
 
   const tags = useMemo(() => extractTags(template), [template]);
 
-  const handleChange = (tag: string, value: string) => {
+  const handleChange = (tag: string, value: string[]) => {
     const currentFills = textFills || {};
     const next = { ...currentFills, [tag]: value };
     onChange(next);
@@ -97,6 +99,13 @@ export default function OutputOptions({
         if (hasTemplateFills) {
           const list = fills[tag];
           const selectId = `dropdown-${tag}`;
+          const selectedValues = textFills?.[tag] ?? [];
+
+          const displayValue = (() => {
+            if (selectedValues.length === 0) return "";
+            if (selectedValues.length === 1) return selectedValues[0];
+            return `${selectedValues[0]} +${selectedValues.length - 1}`;
+          })();
 
           return (
             <FormControl
@@ -116,10 +125,16 @@ export default function OutputOptions({
               </Typography>
               <Select
                 id={selectId}
-                value={textFills?.[tag] ?? ""}
-                onChange={(e) => handleChange(tag, e.target.value)}
+                multiple
+                value={selectedValues}
+                onChange={(e) => handleChange(tag, e.target.value as string[])}
                 displayEmpty
                 disabled={!enabled}
+                renderValue={() => (
+                  <Typography sx={{ textAlign: textAlignment }}>
+                    {displayValue}
+                  </Typography>
+                )}
                 sx={{ textAlign: textAlignment }}
                 MenuProps={{
                   slotProps: {
@@ -134,9 +149,25 @@ export default function OutputOptions({
               >
                 {list.map((val) => (
                   <MenuItem key={val} value={val}>
-                    <Typography component="span" sx={{ textAlign: textAlignment, width: "100%" }}>
-                      {val}
-                    </Typography>
+                    <Checkbox
+                      checked={selectedValues.includes(val)}
+                      sx={{ p: 0.5 }}
+                    />
+                    <ListItemText
+                      sx={{
+                        display: "flex",
+                        flex: 1,
+                        m: 0,
+                      }}
+                      primary={
+                        <Typography
+                          component="span"
+                          sx={{ textAlign: textAlignment, width: "100%" }}
+                        >
+                          {val}
+                        </Typography>
+                      }
+                    />
                   </MenuItem>
                 ))}
               </Select>
@@ -161,8 +192,10 @@ export default function OutputOptions({
               {tag}
             </Typography>
             <TextField
-              value={textFills?.[tag] || ""}
-              onChange={(event) => handleChange(tag, event.target.value)}
+              value={textFills?.[tag]?.[0] ?? ""}
+              onChange={(event) =>
+                handleChange(tag, event.target.value ? [event.target.value] : [])
+              }
               size="small"
               disabled={!enabled}
               slotProps={{ htmlInput: { style: { textAlign: textAlignment } } }}

@@ -8,15 +8,6 @@ import {
 
 const STORAGE_KEY = "template_data";
 
-const defaultButtonGroups: ButtonGroup[] = [
-  {
-    id: generateId("Default Group"),
-    label: "Default Group",
-    template: "",
-    fills: {},
-  },
-];
-
 export const useTemplateStore = () => {
   const [groups, setGroups] = useState<ButtonGroup[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -27,7 +18,7 @@ export const useTemplateStore = () => {
         console.error("Failed to parse local storage data.");
       }
     }
-    return defaultButtonGroups;
+    return [];
   });
 
   useEffect(() => {
@@ -109,7 +100,7 @@ export const useTemplateStore = () => {
 
   const clearAll = () => {
     localStorage.removeItem(STORAGE_KEY);
-    setGroups(defaultButtonGroups);
+    setGroups([]);
   };
 
   return {

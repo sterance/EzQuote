@@ -5,16 +5,17 @@ import OutputGroup from "../components/OutputGroup";
 import OutputOptions from "../components/OutputOptions";
 import Textbox from "../components/Textbox";
 import { extractTags } from "../utils/templateUtils";
+import { formatSelections } from "../utils/textFormatting";
 import { ConfirmationModal } from "../components/ConfirmationModal";
 import AdjustIcon from "@mui/icons-material/Adjust";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 
 const STORAGE_KEY = "output_data";
 
-function fillTemplate(template: string, fills: Record<string, string>) {
+function fillTemplate(template: string, fills: Record<string, string[]>) {
   return template.replace(
     /\{(\w+)\}/g,
-    (_, key: string) => fills[key] ?? `{${key}}`,
+    (_, key: string) => formatSelections(fills[key] ?? []),
   );
 }
 
@@ -41,7 +42,7 @@ export function Output({
     },
   );
   const [textFills, setTextFills] = useState<
-    Record<string, Record<string, string>>
+    Record<string, Record<string, string[]>>
   >(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -75,10 +76,10 @@ export function Output({
         if (tags.length === 0) {
           return group.template;
         }
-        const fills: Record<string, string> = {};
+        const fills: Record<string, string[]> = {};
         const groupFills = textFills[group.id] ?? {};
         for (const tag of tags) {
-          fills[tag] = groupFills[tag] ?? "";
+          fills[tag] = groupFills[tag] ?? [];
         }
         return fillTemplate(group.template, fills);
       })

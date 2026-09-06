@@ -12,7 +12,7 @@
   {
     "id": "cable-damage",
     "label": "Broken Cable",
-    "template": "Your cable has {condition}, and this will require {requirement} due to {detail}.",
+    "template": "Your cable has {condition}, and this will require {requirement}.",
     "fills": {
       "condition": [
         "flooded",
@@ -27,13 +27,6 @@
         "replacement of the connector",
         "cleaning and inspection, with replacement if the corrosion has compromised the conductors",
         "replacement of the damaged section and inspection of nearby wiring"
-      ],
-      "detail": [
-        "due to a water leak in the main supply line",
-        "caused by mechanical stress or accidental damage",
-        "due to frequent connection and disconnection cycles",
-        "due to exposure to moisture or harsh environmental conditions",
-        "due to pests accessing the wiring in storage areas"
       ]
     }
   },
