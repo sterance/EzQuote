@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Link, Snackbar } from "@mui/material";
+import { Alert, Box, Button, Link, Snackbar, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { useTemplateStore } from "../hooks/useTemplateStore";
@@ -147,6 +147,9 @@ export function Output({ advancedMode, onToggleAdvancedMode }: { advancedMode: b
         >
           {advancedMode ? "Advanced Mode" : "Simple Mode"}
         </Button>
+        <Typography variant="h5" sx={{ position: "absolute", left: "50%", transform: "translate(-50%, -50%)" }}>
+          Output Selections
+        </Typography>
         {groups.length > 0 && (
           <Button variant="outlined" color="error" size="small" onClick={() => setClearConfirmOpen(true)} disabled={!hasDataToClear} className="clear-all-btn" sx={{ position: "absolute", top: 8, right: 8, zIndex: 1 }}>
             Clear All
@@ -189,7 +192,9 @@ export function Output({ advancedMode, onToggleAdvancedMode }: { advancedMode: b
           );
         })}
       </Box>
-
+      <Typography variant="h5" sx={{ textAlign: "center", mt: 2 }}>
+        Output
+      </Typography>
       <Textbox label="Output" placeholder="Output will appear here once options are selected above." value={output} />
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Button className="copy-clipboard-btn" variant="contained" color="primary" onClick={handleCopy} disabled={!output}>
