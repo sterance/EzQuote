@@ -147,13 +147,15 @@ export function Output({ advancedMode, onToggleAdvancedMode }: { advancedMode: b
         >
           {advancedMode ? "Advanced Mode" : "Simple Mode"}
         </Button>
-        <Typography variant="h5" sx={{ position: "absolute", left: "50%", transform: "translate(-50%, -50%)" }}>
-          Output Selections
-        </Typography>
         {groups.length > 0 && (
-          <Button variant="outlined" color="error" size="small" onClick={() => setClearConfirmOpen(true)} disabled={!hasDataToClear} className="clear-all-btn" sx={{ position: "absolute", top: 8, right: 8, zIndex: 1 }}>
-            Clear All
-          </Button>
+          <>
+            <Typography variant="h5" sx={{ position: "absolute", left: "50%", transform: "translate(-50%, -50%)" }}>
+              Output Selections
+            </Typography>
+            <Button variant="outlined" color="error" size="small" onClick={() => setClearConfirmOpen(true)} disabled={!hasDataToClear} className="clear-all-btn" sx={{ position: "absolute", top: 8, right: 8, zIndex: 1 }}>
+              Clear All
+            </Button>
+          </>
         )}
         {groups.length === 0 && (
           <Box sx={{ m: 0, textAlign: "center" }}>
