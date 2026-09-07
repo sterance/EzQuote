@@ -7,7 +7,7 @@ import { GroupEditor } from "../components/GroupEditor";
 import { ConfirmationModal } from "../components/ConfirmationModal";
 
 export const Templates: React.FC = () => {
-  const { groups, updateGroup, deleteGroup, addGroup, updateGroupFills, importData, reorderGroups, clearAll, editingGroupId, clearEditingGroupId } = useTemplateStore();
+  const { groups, updateGroup, deleteGroup, addGroup, confirmNewGroup, cancelNewGroup, updateGroupFills, importData, reorderGroups, clearAll, editingGroupId, clearEditingGroupId, newGroupPending } = useTemplateStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
@@ -95,7 +95,7 @@ export const Templates: React.FC = () => {
         <SortableContext items={groups.map((g) => g.id)}>
           <Stack spacing={2}>
             {groups.map((group) => (
-              <GroupEditor key={group.id} group={group} updateGroup={updateGroup} deleteGroup={() => confirmAction(`Are you sure you want to delete the entire "${group.label}" group?`, () => deleteGroup(group.id))} updateGroupFills={(fills) => updateGroupFills(group.id, fills)} confirmAction={confirmAction} editingGroupId={editingGroupId} onExitEdit={clearEditingGroupId} />
+              <GroupEditor key={group.id} group={group} updateGroup={updateGroup} deleteGroup={() => confirmAction(`Are you sure you want to delete the entire "${group.label}" group?`, () => deleteGroup(group.id))} updateGroupFills={(fills) => updateGroupFills(group.id, fills)} confirmAction={confirmAction} editingGroupId={editingGroupId} onExitEdit={clearEditingGroupId} confirmNewGroup={confirmNewGroup} cancelNewGroup={cancelNewGroup} isNewGroup={newGroupPending && editingGroupId === group.id} />
             ))}
           </Stack>
         </SortableContext>

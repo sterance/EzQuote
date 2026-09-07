@@ -33,6 +33,7 @@ export const useTemplateStore = () => {
   });
 
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
+  const [newGroupPending, setNewGroupPending] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
@@ -79,7 +80,18 @@ export const useTemplateStore = () => {
       fillIds: {},
     };
     setGroups((prev) => [...prev, newGroup]);
+    setNewGroupPending(true);
     setEditingGroupId(newGroup.id);
+  };
+
+  const confirmNewGroup = () => {
+    setNewGroupPending(false);
+  };
+
+  const cancelNewGroup = () => {
+    setNewGroupPending(false);
+    setGroups((prev) => prev.filter((g) => g.id !== editingGroupId));
+    setEditingGroupId(null);
   };
 
   const updateGroupFills = (groupId: string, fills: Record<string, string[]>, fillIds?: Record<string, string[]>) => {
@@ -119,6 +131,8 @@ export const useTemplateStore = () => {
     updateGroup,
     deleteGroup,
     addGroup,
+    confirmNewGroup,
+    cancelNewGroup,
     updateGroupFills,
     importData,
     reorderGroups,
@@ -126,5 +140,6 @@ export const useTemplateStore = () => {
     editingGroupId,
     setEditingGroupId,
     clearEditingGroupId: () => setEditingGroupId(null),
+    newGroupPending,
   };
 };

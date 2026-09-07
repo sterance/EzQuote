@@ -17,6 +17,9 @@ interface GroupEditorProps {
   confirmAction: (msg: string, action: () => void) => void;
   editingGroupId: string | null;
   onExitEdit: () => void;
+  confirmNewGroup: () => void;
+  cancelNewGroup: () => void;
+  isNewGroup: boolean;
 }
 
 export const GroupEditor: React.FC<GroupEditorProps> = ({
@@ -27,6 +30,9 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
   confirmAction,
   editingGroupId,
   onExitEdit,
+  confirmNewGroup,
+  cancelNewGroup,
+  isNewGroup,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -102,6 +108,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
       );
     } else {
       updateGroup(group.id, editLabel, editTemplate);
+      confirmNewGroup();
       exitEdit();
     }
   };
@@ -117,6 +124,9 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
   const handleCancel = () => {
     setEditLabel(group.label);
     setEditTemplate(group.template);
+    if (isNewGroup) {
+      cancelNewGroup();
+    }
     exitEdit();
   };
 
@@ -232,6 +242,8 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
             <GroupEditorEdit
               editLabel={editLabel}
               editTemplate={editTemplate}
+              labelError={labelError}
+              templateError={templateError}
               onLabelChange={handleLabelChange}
               onTemplateChange={handleTemplateChange}
               onTemplateClick={handleTemplateClick}
