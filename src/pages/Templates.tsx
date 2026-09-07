@@ -113,7 +113,7 @@ export const Templates: React.FC = () => {
       >
         + Add Group
       </Button>
-      <Stack direction="row" spacing={2} sx={{ mt: 3, mb: 3, alignItems: "center", justifyContent: "center" }}>
+      <Stack direction="row" spacing={2} sx={{ mt: 3, mb: 3, alignItems: "center", justifyContent: "center" }} className="template-actions-row">
         <input type="file" accept=".json" style={{ display: "none" }} ref={fileInputRef} onChange={handleImport} />
         <Button variant="contained" className="template-action-btn" onClick={() => (groups.length > 0 ? confirmAction("Are you sure you want to import templates? This will overwrite all existing templates.", () => fileInputRef.current?.click()) : fileInputRef.current?.click())}>
           Import Templates
@@ -121,7 +121,7 @@ export const Templates: React.FC = () => {
         <Button variant="contained" className="template-action-btn" onClick={handleExport}>
           Export Templates
         </Button>
-        <Button variant="contained" color="error" onClick={() => confirmAction("Are you sure you want to clear all templates? This will reset to defaults and cannot be undone.", handleClear)}>
+        <Button variant="contained" color="error" className="template-clear-btn" onClick={() => confirmAction("Are you sure you want to clear all templates? This will reset to defaults and cannot be undone.", handleClear)}>
           Clear Templates
         </Button>
       </Stack>

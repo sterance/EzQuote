@@ -107,7 +107,7 @@ export function Settings() {
               textAlign: "center",
             }}
           >
-            Text Alignment
+            Input Text Alignment
           </FormLabel>
           <ToggleButtonGroup value={textAlignment} exclusive onChange={handleAlignmentChange} aria-label="text alignment" size="small" sx={toggleGroupSx}>
             <ToggleButton value="left" aria-label="left align">

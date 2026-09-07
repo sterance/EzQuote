@@ -13,15 +13,10 @@ interface FillValuePanelProps {
   onDeleteValue: (tag: string, index: number) => void;
 }
 
-export const FillValuePanel: React.FC<FillValuePanelProps> = ({
-  group,
-  groupTags,
-  onAddValue,
-  onUpdateValue,
-  onDeleteValue,
-}) => {
+export const FillValuePanel: React.FC<FillValuePanelProps> = ({ group, groupTags, onAddValue, onUpdateValue, onDeleteValue }) => {
   return (
     <Box
+      className="tmpl-fill-panel"
       sx={{
         p: 2,
         bgcolor: "var(--surface-muted)",
@@ -35,8 +30,7 @@ export const FillValuePanel: React.FC<FillValuePanelProps> = ({
     >
       {groupTags.length === 0 ? (
         <Typography variant="caption" color="text.secondary">
-          No variables in this template yet. Add {"{tag}"} placeholders using
-          "Insert Variable" in Edit mode.
+          No variables in this template yet. Add {"{tag}"} placeholders using "Insert Variable" in Edit mode.
         </Typography>
       ) : (
         groupTags.map((tag) => {
@@ -57,42 +51,22 @@ export const FillValuePanel: React.FC<FillValuePanelProps> = ({
                 gap: 1,
               }}
             >
-              <Typography
-                variant="subtitle2"
-                sx={{ fontWeight: "bold", textTransform: "capitalize" }}
-              >
+              <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "capitalize", textAlign: "center" }}>
                 {tag}
               </Typography>
               <Divider />
               {list.length === 0 ? (
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ textAlign: "center" }}
-                >
-                  No fill values yet. This fill will appear as a custom text
-                  input in the{" "}
+                <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center" }}>
+                  No fill values yet. This fill will appear as a custom text input in the{" "}
                   <Link component={RouterLink} to="/output">
                     Output page
                   </Link>
                   .
                 </Typography>
               ) : (
-                <SortableContext
-                  items={list.map((_, i) => `fill:${group.id}:${fillIds[i]}`)}
-                >
+                <SortableContext items={list.map((_, i) => `fill:${group.id}:${fillIds[i]}`)}>
                   {list.map((value, idx) => (
-                    <SortableFillRow
-                      key={fillIds[idx]}
-                      id={`fill:${group.id}:${fillIds[idx]}`}
-                      groupId={group.id}
-                      fillId={fillIds[idx]}
-                      tag={tag}
-                      index={idx}
-                      value={value}
-                      onChange={(v) => onUpdateValue(tag, idx, v)}
-                      onDelete={() => onDeleteValue(tag, idx)}
-                    />
+                    <SortableFillRow key={fillIds[idx]} id={`fill:${group.id}:${fillIds[idx]}`} groupId={group.id} fillId={fillIds[idx]} tag={tag} index={idx} value={value} onChange={(v) => onUpdateValue(tag, idx, v)} onDelete={() => onDeleteValue(tag, idx)} />
                   ))}
                 </SortableContext>
               )}

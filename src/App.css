@@ -87,6 +87,8 @@
 
 .theme-toggle {
   color: var(--nav-text) !important;
+  width: 48px;
+  flex-shrink: 0;
 }
 
 .theme-toggle:hover {
@@ -389,4 +391,77 @@ h1 {
 .confirmation-modal .MuiOutlinedInput-input::placeholder {
   color: var(--text-muted);
   opacity: 1;
+}
+
+.tmpl-drag-handle svg {
+  margin-left: 20px !important;
+}
+
+@media (max-width: 600px) {
+  .top-nav {
+    min-height: 56px;
+    padding: 0 12px;
+  }
+
+  .brand-mark {
+    font-size: 0.95rem;
+  }
+
+  .nav-links {
+    gap: 2px;
+    margin-right: 8px;
+  }
+
+  .nav-links a {
+    font-size: 0.85rem;
+    padding: 6px 6px;
+  }
+
+  .template-actions-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .template-actions-row .MuiButton-root {
+    font-size: 0.7rem;
+    min-width: 0;
+    padding: 4px 8px;
+    white-space: nowrap;
+  }
+
+  .tmpl-card-actions {
+    display: flex !important;
+    flex: 1 !important;
+    flex-direction: column !important;
+    row-gap: 8px;
+    align-self: stretch !important;
+    align-items: stretch !important;
+  }
+
+  .tmpl-card-actions > * {
+    margin-left: 0 !important;
+  }
+
+  .tmpl-card-actions .MuiButton-root {
+    flex: 1 !important;
+    font-size: 0.75rem;
+    min-width: 0 !important;
+    padding: 2px 6px;
+    width: 100%;
+  }
+
+  .tmpl-fill-panel {
+    flex-wrap: nowrap;
+    gap: 12px;
+    overflow-x: auto;
+  }
+
+  .tmpl-fill-panel > .MuiBox-root {
+    flex: 0 0 85%;
+  }
+
+  .settings-sections .MuiToggleButton-root {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
 }

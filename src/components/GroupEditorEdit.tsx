@@ -17,21 +17,7 @@ interface GroupEditorEditProps {
   onLabelRef: (el: HTMLInputElement | null) => void;
 }
 
-export const GroupEditorEdit: React.FC<GroupEditorEditProps> = ({
-  editLabel,
-  editTemplate,
-  labelError,
-  templateError,
-  onLabelChange,
-  onTemplateChange,
-  onTemplateClick,
-  onTemplateKeyUp,
-  onSave,
-  onCancel,
-  onInsertVariable,
-  onTemplateRef,
-  onLabelRef,
-}) => {
+export const GroupEditorEdit: React.FC<GroupEditorEditProps> = ({ editLabel, editTemplate, labelError, templateError, onLabelChange, onTemplateChange, onTemplateClick, onTemplateKeyUp, onSave, onCancel, onInsertVariable, onTemplateRef, onLabelRef }) => {
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     onTemplateChange(e.target.value, e.target.selectionStart ?? e.target.value.length);
   };
@@ -41,16 +27,7 @@ export const GroupEditorEdit: React.FC<GroupEditorEditProps> = ({
       <Typography variant="h6" sx={{ fontWeight: "bold" }}>
         Label
       </Typography>
-<TextField
-  fullWidth
-  value={editLabel}
-  onChange={(e) => onLabelChange(e.target.value)}
-  placeholder="Group Label"
-  size="small"
-  inputRef={onLabelRef}
-  error={!!labelError}
-  helperText={labelError}
-/>
+      <TextField fullWidth value={editLabel} onChange={(e) => onLabelChange(e.target.value)} placeholder="Group Label" size="small" inputRef={onLabelRef} error={!!labelError} helperText={labelError} />
       <Box
         sx={{
           display: "flex",
@@ -63,19 +40,7 @@ export const GroupEditorEdit: React.FC<GroupEditorEditProps> = ({
         </Typography>
         <Button onClick={onInsertVariable}>Insert Variable</Button>
       </Box>
-<TextField
-  fullWidth
-  multiline
-  rows={4}
-  value={editTemplate}
-  onChange={handleTemplateChange}
-  onClick={(e) => onTemplateClick((e.target as HTMLInputElement | HTMLTextAreaElement).selectionStart ?? 0)}
-  onKeyUp={(e) => onTemplateKeyUp((e.target as HTMLInputElement | HTMLTextAreaElement).selectionStart ?? 0)}
-  inputRef={onTemplateRef}
-  placeholder="Template text e.g. Hello {name}"
-  error={!!templateError}
-  helperText={templateError}
-/>
+      <TextField fullWidth multiline rows={4} value={editTemplate} onChange={handleTemplateChange} onClick={(e) => onTemplateClick((e.target as HTMLInputElement | HTMLTextAreaElement).selectionStart ?? 0)} onKeyUp={(e) => onTemplateKeyUp((e.target as HTMLInputElement | HTMLTextAreaElement).selectionStart ?? 0)} inputRef={onTemplateRef} placeholder="Template text e.g. Hello {name}" error={!!templateError} helperText={templateError} />
       <Stack direction="row" spacing={1}>
         <Button variant="contained" color="primary" size="small" onClick={onSave}>
           Save

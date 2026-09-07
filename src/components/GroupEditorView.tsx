@@ -38,12 +38,14 @@ export const GroupEditorView: React.FC<GroupEditorViewProps> = ({ group, isExpan
         >
           <Typography sx={{ fontSize: "1.5rem", lineHeight: 1 }}>‹</Typography>
         </IconButton>
-        <Button variant="outlined" size="small" onClick={onEdit}>
-          Edit
-        </Button>
-        <Button variant="outlined" size="small" onClick={onDelete}>
-          Delete
-        </Button>
+        <Stack direction="row" spacing={1} className="tmpl-card-actions">
+          <Button variant="outlined" size="small" onClick={onEdit}>
+            Edit
+          </Button>
+          <Button variant="outlined" size="small" onClick={onDelete}>
+            Delete
+          </Button>
+        </Stack>
       </Stack>
       <Typography
         variant="caption"
@@ -58,7 +60,7 @@ export const GroupEditorView: React.FC<GroupEditorViewProps> = ({ group, isExpan
       >
         {group.template}
       </Typography>
-      <Box component="span" {...dragHandleAttributes} {...dragHandleListeners} sx={{ display: "flex", alignItems: "center", justifyContent: "center", cursor: "grab", color: "var(--text)" }}>
+      <Box component="span" className="tmpl-drag-handle" {...dragHandleAttributes} {...dragHandleListeners} sx={{ display: "flex", alignItems: "center", justifyContent: "center", cursor: "grab", color: "var(--text)" }}>
         <DragHandleIcon fontSize="small" />
       </Box>
     </Box>
