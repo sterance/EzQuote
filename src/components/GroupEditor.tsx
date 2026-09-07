@@ -39,6 +39,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
   const [templateError, setTemplateError] = useState<string | null>(null);
 
   const templateRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const labelRef = useRef<HTMLInputElement | null>(null);
   const cursorPosRef = useRef<number | null>(null);
   const autoEnteredRef = useRef(false);
   const shouldFocusLabelRef = useRef(false);
@@ -52,6 +53,15 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
       setIsEditing(true);
     }
   }, [editingGroupId, group.id, group.label, group.template]);
+
+  useEffect(() => {
+    if (isEditing && shouldFocusLabelRef.current) {
+      shouldFocusLabelRef.current = false;
+      requestAnimationFrame(() => {
+        labelRef.current?.focus();
+      });
+    }
+  }, [isEditing]);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: group.id,
@@ -110,7 +120,8 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
     exitEdit();
   };
 
-  const handleLabelChange = () => {
+  const handleLabelChange = (value: string) => {
+    setEditLabel(value);
     if (labelError) setLabelError(null);
   };
 
@@ -229,6 +240,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
               onCancel={handleCancel}
               onInsertVariable={handleInsertVariable}
               onTemplateRef={handleTemplateRef}
+              onLabelRef={(el) => { labelRef.current = el; }}
             />
           ) : (
             <GroupEditorView
@@ -239,6 +251,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
                 setIsEditing(true);
                 setLabelError(null);
                 setTemplateError(null);
+                shouldFocusLabelRef.current = true;
                 onExitEdit();
               }}
               onDelete={deleteGroup}

@@ -4,7 +4,7 @@ import { Box, Button, TextField, Typography, Stack } from "@mui/material";
 interface GroupEditorEditProps {
   editLabel: string;
   editTemplate: string;
-  onLabelChange: () => void;
+  onLabelChange: (value: string) => void;
   onTemplateChange: (value: string, cursorPos: number) => void;
   onTemplateClick: (cursorPos: number) => void;
   onTemplateKeyUp: (cursorPos: number) => void;
@@ -12,6 +12,7 @@ interface GroupEditorEditProps {
   onCancel: () => void;
   onInsertVariable: () => void;
   onTemplateRef: (el: HTMLInputElement | HTMLTextAreaElement | null) => void;
+  onLabelRef: (el: HTMLInputElement | null) => void;
 }
 
 export const GroupEditorEdit: React.FC<GroupEditorEditProps> = ({
@@ -25,6 +26,7 @@ export const GroupEditorEdit: React.FC<GroupEditorEditProps> = ({
   onCancel,
   onInsertVariable,
   onTemplateRef,
+  onLabelRef,
 }) => {
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     onTemplateChange(e.target.value, e.target.selectionStart ?? e.target.value.length);
@@ -35,13 +37,14 @@ export const GroupEditorEdit: React.FC<GroupEditorEditProps> = ({
       <Typography variant="h6" sx={{ fontWeight: "bold" }}>
         Label
       </Typography>
-      <TextField
-        fullWidth
-        value={editLabel}
-        onChange={() => onLabelChange()}
-        placeholder="Group Label"
-        size="small"
-      />
+<TextField
+  fullWidth
+  value={editLabel}
+  onChange={(e) => onLabelChange(e.target.value)}
+  placeholder="Group Label"
+  size="small"
+  inputRef={onLabelRef}
+/>
       <Box
         sx={{
           display: "flex",
