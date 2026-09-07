@@ -398,6 +398,45 @@ h1 {
 }
 
 @media (max-width: 600px) {
+  .group-editor-mobile-grid {
+    display: grid !important;
+    position: relative;
+    grid-column: 1 / -1;
+    grid-row: 1 / span 2;
+    grid-template-columns: minmax(0, 1fr) 86px;
+    grid-template-rows: auto auto;
+    column-gap: 8px;
+    row-gap: 8px;
+  }
+
+  .group-editor-mobile-grid > .tmpl-drag-handle {
+    position: absolute;
+    top: 70px;
+    right: 0;
+    bottom: 0;
+    width: 86px;
+    align-items: center !important;
+  }
+
+  .group-editor-mobile-grid > .group-editor-label {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .group-editor-mobile-grid > .group-editor-controls {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 86px;
+    align-items: flex-start;
+    z-index: 1;
+  }
+
+  .group-editor-mobile-grid > .group-editor-template {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
   .top-nav {
     min-height: 56px;
     padding: 0 12px;

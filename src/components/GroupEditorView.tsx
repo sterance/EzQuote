@@ -24,44 +24,47 @@ export const GroupEditorView: React.FC<GroupEditorViewProps> = ({ group, isExpan
         rowGap: 1,
       }}
     >
-      <Typography variant="h6" sx={{ fontWeight: "bold", cursor: "pointer" }} onClick={onToggleExpand}>
-        {group.label}
-      </Typography>
-      <Stack direction="row" spacing={1} sx={{ alignItems: "center", justifyContent: "flex-end" }}>
-        <IconButton
-          size="small"
-          onClick={onToggleExpand}
-          sx={{
-            transform: isExpanded ? "rotate(90deg)" : "rotate(-90deg)",
-            transition: "transform 0.3s",
-          }}
-        >
-          <Typography sx={{ fontSize: "1.5rem", lineHeight: 1 }}>‹</Typography>
-        </IconButton>
-        <Stack direction="row" spacing={1} className="tmpl-card-actions">
-          <Button variant="outlined" size="small" onClick={onEdit}>
-            Edit
-          </Button>
-          <Button variant="outlined" size="small" onClick={onDelete}>
-            Delete
-          </Button>
+      <Box className="group-editor-mobile-grid" sx={{ display: "contents" }}>
+        <Typography className="group-editor-label" variant="h6" sx={{ fontWeight: "bold", cursor: "pointer" }} onClick={onToggleExpand}>
+          {group.label}
+        </Typography>
+        <Stack className="group-editor-controls" direction="row" spacing={1} sx={{ alignItems: "center", justifyContent: "flex-end" }}>
+          <IconButton
+            size="small"
+            onClick={onToggleExpand}
+            sx={{
+              transform: isExpanded ? "rotate(90deg)" : "rotate(-90deg)",
+              transition: "transform 0.3s",
+            }}
+          >
+            <Typography sx={{ fontSize: "1.5rem", lineHeight: 1 }}>‹</Typography>
+          </IconButton>
+          <Stack direction="row" spacing={1} className="tmpl-card-actions">
+            <Button variant="outlined" size="small" onClick={onEdit}>
+              Edit
+            </Button>
+            <Button variant="outlined" size="small" onClick={onDelete}>
+              Delete
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
-      <Typography
-        variant="caption"
-        sx={{
-          fontFamily: "monospace",
-          bgcolor: "var(--surface-muted)",
-          p: 1,
-          borderRadius: 1,
-          cursor: "pointer",
-        }}
-        onClick={onToggleExpand}
-      >
-        {group.template}
-      </Typography>
-      <Box component="span" className="tmpl-drag-handle" {...dragHandleAttributes} {...dragHandleListeners} sx={{ display: "flex", alignItems: "center", justifyContent: "center", cursor: "grab", color: "var(--text)" }}>
-        <DragHandleIcon fontSize="small" />
+        <Typography
+          className="group-editor-template"
+          variant="caption"
+          sx={{
+            fontFamily: "monospace",
+            bgcolor: "var(--surface-muted)",
+            p: 1,
+            borderRadius: 1,
+            cursor: "pointer",
+          }}
+          onClick={onToggleExpand}
+        >
+          {group.template}
+        </Typography>
+        <Box component="span" className="tmpl-drag-handle" {...dragHandleAttributes} {...dragHandleListeners} sx={{ display: "flex", alignItems: "center", justifyContent: "center", cursor: "grab", color: "var(--text)" }}>
+          <DragHandleIcon fontSize="small" />
+        </Box>
       </Box>
     </Box>
   );
