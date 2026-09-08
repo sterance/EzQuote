@@ -1,6 +1,4 @@
-import { useId } from "react";
 import Box from "@mui/material/Box";
-import Checkbox from "@mui/material/Checkbox";
 import Paper from "@mui/material/Paper";
 import type { SxProps } from "@mui/material";
 import type { Theme } from "@mui/material";
@@ -14,11 +12,10 @@ interface OutputGroupProps {
 }
 
 export default function OutputGroup({ label, enabled, onToggleEnabled, children, sx }: OutputGroupProps) {
-  const groupId = useId();
-
   return (
     <Paper
       className="output-card"
+      data-checked={enabled}
       sx={{
         overflow: "hidden",
         display: "flex",
@@ -37,21 +34,16 @@ export default function OutputGroup({ label, enabled, onToggleEnabled, children,
           alignItems: "center",
         }}
       >
-        <Box
-          component="label"
-          htmlFor={`checkbox-${groupId}`}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            cursor: "pointer",
-            opacity: enabled ? 1 : 0.55,
-          }}
+        <button
+          type="button"
+          role="checkbox"
+          aria-checked={enabled}
+          data-checked={enabled}
+          className="output-group-toggle"
+          onClick={() => onToggleEnabled(!enabled)}
         >
-          <Checkbox id={`checkbox-${groupId}`} size="small" checked={enabled} onChange={(event) => onToggleEnabled(event.target.checked)} sx={{ p: 0.5, "&.Mui-checked": { color: "var(--accent)" } }} />
-          <Box component="span" id={`label-${groupId}`} className="button-group-label" sx={{ m: 0, alignSelf: "center" }}>
-            {label}
-          </Box>
-        </Box>
+          {label}
+        </button>
       </Box>
       {children && (
         <Box

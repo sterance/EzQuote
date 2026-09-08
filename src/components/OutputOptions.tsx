@@ -115,7 +115,14 @@ export default function OutputOptions({ fills, template, textFills = {}, enabled
               >
                 {list.map((val) => (
                   <MenuItem key={val} value={val}>
-                    <Checkbox checked={selectedValues.includes(val)} sx={{ p: 0.5, "&.Mui-checked": { color: "var(--accent)" } }} />
+                    <Checkbox
+                      checked={selectedValues.includes(val)}
+                      sx={{
+                        p: 0.5,
+                        color: "var(--text-muted)",
+                        "&.Mui-checked": { color: "var(--accent)" },
+                      }}
+                    />
                     <ListItemText
                       sx={{
                         display: "flex",
