@@ -109,7 +109,7 @@ export function Settings() {
           >
             Input Text Alignment
           </FormLabel>
-          <ToggleButtonGroup value={textAlignment} exclusive onChange={handleAlignmentChange} aria-label="text alignment" size="small" sx={toggleGroupSx}>
+          <ToggleButtonGroup value={textAlignment} exclusive onChange={handleAlignmentChange} aria-label="text alignment" size="small" sx={toggleGroupSx(isDarkMode)}>
             <ToggleButton value="left" aria-label="left align">
               Left
             </ToggleButton>
@@ -135,7 +135,7 @@ export function Settings() {
           >
             Light Mode Theme
           </FormLabel>
-          <ToggleButtonGroup value={lightThemeIndex} exclusive onChange={handleLightThemeChange} aria-label="light mode theme" size="small" sx={toggleGroupSx}>
+          <ToggleButtonGroup value={lightThemeIndex} exclusive onChange={handleLightThemeChange} aria-label="light mode theme" size="small" sx={toggleGroupSx(isDarkMode)}>
             {LIGHT_THEMES.map((theme, index) => (
               <ToggleButton key={theme.label} value={index} aria-label={theme.label} title={theme.label} sx={toggleButtonSx}>
                 <Box
@@ -171,7 +171,7 @@ export function Settings() {
           >
             Dark Mode Theme
           </FormLabel>
-          <ToggleButtonGroup value={darkThemeIndex} exclusive onChange={handleDarkThemeChange} aria-label="dark mode theme" size="small" sx={toggleGroupSx}>
+          <ToggleButtonGroup value={darkThemeIndex} exclusive onChange={handleDarkThemeChange} aria-label="dark mode theme" size="small" sx={toggleGroupSx(isDarkMode)}>
             {DARK_THEMES.map((theme, index) => (
               <ToggleButton key={theme.label} value={index} aria-label={theme.label} title={theme.label} sx={toggleButtonSx}>
                 <Box
@@ -198,19 +198,21 @@ export function Settings() {
   );
 }
 
-function toggleGroupSx() {
+function toggleGroupSx(isDarkMode: boolean) {
   return {
     flexWrap: "wrap",
-    bgcolor: "var(--surface)",
+    justifyContent: "center", // <-- centers buttons in each row
+    bgcolor: isDarkMode ? "var(--surface)" : "transparent",
+    border: isDarkMode ? "1px solid var(--text)" : undefined,
     "& .MuiToggleButton-root": {
       color: "var(--text)",
-      borderColor: "var(--text-muted)",
+      border: isDarkMode ? "1px solid var(--text)" : undefined,
       "&.Mui-selected": {
-        bgcolor: "var(--surface-muted)",
+        bgcolor: isDarkMode ? "var(--surface-muted)" : undefined,
         color: "var(--text)",
       },
       "&:hover": {
-        bgcolor: "var(--surface-muted)",
+        bgcolor: isDarkMode ? "var(--surface-muted)" : undefined,
       },
     },
   } as const;

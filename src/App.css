@@ -443,6 +443,15 @@ h1 {
   margin-left: 20px !important;
 }
 
+.settings-sections {
+  align-items: center;
+}
+
+.settings-sections .MuiFormLabel-root {
+  text-align: center;
+  width: 100%;
+}
+
 @media (max-width: 600px) {
   .group-editor-mobile-grid {
     display: grid !important;
