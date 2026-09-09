@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import type { ButtonGroup } from "../types";
-import { extractTags, syncGroupFills, syncFillIds, generateId } from "../utils/templateUtils";
+import { extractTags, syncGroupFills, syncFillIds, syncStarredFillIds, generateId } from "../utils/templateUtils";
 
 const STORAGE_KEY = "template_data";
 
 const normalizeGroup = (group: Partial<ButtonGroup>): ButtonGroup => {
   const id = group.id ?? generateId();
   const fills = group.fills ?? {};
+  const fillIds = group.fillIds ?? {};
+  const starredFillIds = group.starredFillIds ?? {};
   const tags = extractTags(group.template ?? "");
 
   return {
@@ -14,7 +16,8 @@ const normalizeGroup = (group: Partial<ButtonGroup>): ButtonGroup => {
     label: group.label ?? "",
     template: group.template ?? "",
     fills: syncGroupFills(fills, tags),
-    fillIds: syncFillIds(group.fillIds, fills, tags, generateId),
+    fillIds: syncFillIds(fillIds, fills, tags, generateId),
+    starredFillIds: syncStarredFillIds(starredFillIds, fillIds, tags),
   };
 };
 
@@ -46,13 +49,15 @@ export const useTemplateStore = () => {
 
         const newTags = extractTags(newTemplate);
         const updatedFills = syncGroupFills(group.fills || {}, newTags);
+        const updatedFillIds = syncFillIds(group.fillIds, updatedFills, newTags, generateId);
 
         return {
           ...group,
           label: newLabel,
           template: newTemplate,
           fills: updatedFills,
-          fillIds: syncFillIds(group.fillIds, updatedFills, newTags, generateId),
+          fillIds: updatedFillIds,
+          starredFillIds: syncStarredFillIds(group.starredFillIds, updatedFillIds, newTags),
         };
       }),
     );
@@ -78,6 +83,7 @@ export const useTemplateStore = () => {
       template: "",
       fills: {},
       fillIds: {},
+      starredFillIds: {},
     };
     setGroups((prev) => [...prev, newGroup]);
     setNewGroupPending(true);
@@ -102,9 +108,29 @@ export const useTemplateStore = () => {
               ...group,
               fills,
               fillIds: fillIds ?? syncFillIds(group.fillIds, fills, extractTags(group.template), generateId),
+              starredFillIds: syncStarredFillIds(group.starredFillIds, fillIds ?? group.fillIds, extractTags(group.template)),
             }
           : group,
       ),
+    );
+  };
+
+  const toggleStarredValue = (groupId: string, tag: string, fillId: string) => {
+    setGroups((prev) =>
+      prev.map((group) => {
+        if (group.id !== groupId) return group;
+        const current = group.starredFillIds?.[tag] ?? [];
+        const next = current.includes(fillId)
+          ? current.filter((id) => id !== fillId)
+          : [...current, fillId];
+        return {
+          ...group,
+          starredFillIds: {
+            ...(group.starredFillIds || {}),
+            [tag]: next,
+          },
+        };
+      }),
     );
   };
 
@@ -134,6 +160,7 @@ export const useTemplateStore = () => {
     confirmNewGroup,
     cancelNewGroup,
     updateGroupFills,
+    toggleStarredValue,
     importData,
     reorderGroups,
     clearAll,

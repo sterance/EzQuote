@@ -14,6 +14,7 @@ interface GroupEditorProps {
   updateGroup: (id: string, label: string, template: string) => void;
   deleteGroup: () => void;
   updateGroupFills: (fills: Record<string, string[]>, fillIds?: Record<string, string[]>) => void;
+  onToggleStar: (tag: string, fillId: string) => void;
   confirmAction: (msg: string, action: () => void) => void;
   editingGroupId: string | null;
   onExitEdit: () => void;
@@ -27,6 +28,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
   updateGroup,
   deleteGroup,
   updateGroupFills,
+  onToggleStar,
   confirmAction,
   editingGroupId,
   onExitEdit,
@@ -280,6 +282,7 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
             onAddValue={handleAddValue}
             onUpdateValue={handleUpdateValue}
             onDeleteValue={handleDeleteValue}
+            onToggleStar={onToggleStar}
           />
         )}
       </Paper>

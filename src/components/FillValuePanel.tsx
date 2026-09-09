@@ -11,9 +11,10 @@ interface FillValuePanelProps {
   onAddValue: (tag: string) => void;
   onUpdateValue: (tag: string, index: number, value: string) => void;
   onDeleteValue: (tag: string, index: number) => void;
+  onToggleStar: (tag: string, fillId: string) => void;
 }
 
-export const FillValuePanel: React.FC<FillValuePanelProps> = ({ group, groupTags, onAddValue, onUpdateValue, onDeleteValue }) => {
+export const FillValuePanel: React.FC<FillValuePanelProps> = ({ group, groupTags, onAddValue, onUpdateValue, onDeleteValue, onToggleStar }) => {
   return (
     <Box
       className="tmpl-fill-panel"
@@ -65,9 +66,26 @@ export const FillValuePanel: React.FC<FillValuePanelProps> = ({ group, groupTags
                 </Typography>
               ) : (
                 <SortableContext items={list.map((_, i) => `fill:${group.id}:${fillIds[i]}`)}>
-                  {list.map((value, idx) => (
-                    <SortableFillRow key={fillIds[idx]} id={`fill:${group.id}:${fillIds[idx]}`} groupId={group.id} fillId={fillIds[idx]} tag={tag} index={idx} value={value} onChange={(v) => onUpdateValue(tag, idx, v)} onDelete={() => onDeleteValue(tag, idx)} />
-                  ))}
+                  {list.map((value, idx) => {
+                    const fillId = fillIds[idx];
+                    const starredForTag = (group.starredFillIds || {})[tag] ?? [];
+                    const isStarred = starredForTag.includes(fillId);
+                    return (
+                      <SortableFillRow
+                        key={fillId}
+                        id={`fill:${group.id}:${fillId}`}
+                        groupId={group.id}
+                        fillId={fillId}
+                        tag={tag}
+                        index={idx}
+                        value={value}
+                        onChange={(v) => onUpdateValue(tag, idx, v)}
+                        onDelete={() => onDeleteValue(tag, idx)}
+                        isStarred={isStarred}
+                        onToggleStar={() => onToggleStar(tag, fillId)}
+                      />
+                    );
+                  })}
                 </SortableContext>
               )}
               <Button

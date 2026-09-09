@@ -4,4 +4,5 @@ export interface ButtonGroup {
   template: string;
   fills: Record<string, string[]>;
   fillIds: Record<string, string[]>;
+  starredFillIds: Record<string, string[]>;
 }

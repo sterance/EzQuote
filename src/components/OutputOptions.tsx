@@ -24,13 +24,15 @@ function getSettings(): Record<string, unknown> {
 
 interface OutputOptionsProps {
   fills: Record<string, string[]>;
+  fillIds: Record<string, string[]>;
+  starredFillIds: Record<string, string[]>;
   template: string;
   textFills?: Record<string, string[]>;
   enabled: boolean;
   onChange: (fills: Record<string, string[]>) => void;
 }
 
-export default function OutputOptions({ fills, template, textFills = {}, enabled, onChange }: OutputOptionsProps) {
+export default function OutputOptions({ fills, fillIds, starredFillIds, template, textFills = {}, enabled, onChange }: OutputOptionsProps) {
   const [textAlignment, setTextAlignment] = useState<TextAlignment>(() => {
     return (getSettings()[TEXT_ALIGNMENT_KEY] as TextAlignment) || "left";
   });
@@ -72,9 +74,25 @@ export default function OutputOptions({ fills, template, textFills = {}, enabled
 
         if (hasTemplateFills) {
           const list = fills[tag];
-          const selectId = `dropdown-${tag}`;
-          const selectedValues = textFills?.[tag] ?? [];
+          const fillIdsForTag = fillIds?.[tag] ?? [];
+          const starredIds = starredFillIds?.[tag] ?? [];
+          const textFillsForTag = textFills?.[tag];
+          const isUntouched = textFillsForTag === undefined;
 
+          const sortedList = list
+            .map((val, i) => ({ val, id: fillIdsForTag[i] }))
+            .sort((a, b) => {
+              const aStarred = starredIds.includes(a.id);
+              const bStarred = starredIds.includes(b.id);
+              if (aStarred && !bStarred) return -1;
+              if (!aStarred && bStarred) return 1;
+              return 0;
+            })
+            .map((p) => p.val);
+
+          const selectedValues = isUntouched ? list.filter((_, i) => starredIds.includes(fillIdsForTag[i])) : (textFillsForTag ?? []);
+
+          const selectId = `dropdown-${tag}`;
           const displayValue = (() => {
             if (selectedValues.length === 0) return "";
             if (selectedValues.length === 1) return selectedValues[0];
@@ -113,7 +131,7 @@ export default function OutputOptions({ fills, template, textFills = {}, enabled
                   },
                 }}
               >
-                {list.map((val) => (
+                {sortedList.map((val) => (
                   <MenuItem key={val} value={val}>
                     <Checkbox
                       checked={selectedValues.includes(val)}

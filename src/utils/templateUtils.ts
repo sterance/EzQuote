@@ -35,3 +35,18 @@ export const syncFillIds = (currentFillIds: Record<string, string[]> | undefined
 
   return syncedFillIds;
 };
+
+export const syncStarredFillIds = (
+  currentStarredFillIds: Record<string, string[]> | undefined,
+  fillIds: Record<string, string[]>,
+  tags: string[]
+): Record<string, string[]> => {
+  const syncedStarredFillIds: Record<string, string[]> = {};
+
+  for (const tag of tags) {
+    const validIds = fillIds[tag] ?? [];
+    syncedStarredFillIds[tag] = (currentStarredFillIds?.[tag] ?? []).filter((id) => validIds.includes(id));
+  }
+
+  return syncedStarredFillIds;
+};
