@@ -453,6 +453,20 @@ h1 {
 }
 
 @media (max-width: 600px) {
+  .main-content {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .help-sections {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+  .button-sections {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+
   .group-editor-mobile-grid {
     display: grid !important;
     position: relative;

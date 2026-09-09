@@ -1,5 +1,6 @@
 import { Alert, Box, Button, Link, Snackbar, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
+import * as React from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { useTemplateStore } from "../hooks/useTemplateStore";
 import OutputGroup from "../components/OutputGroup";
@@ -12,6 +13,17 @@ import AdjustIcon from "@mui/icons-material/Adjust";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 
 const STORAGE_KEY = "output_data";
+const SETTINGS_DATA_KEY = "settings_data";
+const SPACES_BETWEEN_PARAGRAPHS_KEY = "spaces_between_paragraphs";
+
+function getSettings(): Record<string, unknown> {
+  try {
+    const saved = localStorage.getItem(SETTINGS_DATA_KEY);
+    return saved ? JSON.parse(saved) : {};
+  } catch {
+    return {};
+  }
+}
 
 function fillTemplate(template: string, fills: Record<string, string[]>) {
   return template.replace(/\{(\w+)\}/g, (_, key: string) => formatSelections(fills[key] ?? []));
@@ -43,6 +55,19 @@ export function Output({ advancedMode, onToggleAdvancedMode }: { advancedMode: b
     }
     return {};
   });
+  const [spacesBetweenParagraphs, setSpacesBetweenParagraphs] = useState<number>(() => {
+    const settings = getSettings();
+    return typeof settings[SPACES_BETWEEN_PARAGRAPHS_KEY] === "number" ? settings[SPACES_BETWEEN_PARAGRAPHS_KEY] : 1;
+  });
+
+  React.useEffect(() => {
+    const handleSettingsChanged = () => {
+      const settings = getSettings();
+      setSpacesBetweenParagraphs(typeof settings[SPACES_BETWEEN_PARAGRAPHS_KEY] === "number" ? settings[SPACES_BETWEEN_PARAGRAPHS_KEY] : 1);
+    };
+    window.addEventListener("settings-changed", handleSettingsChanged);
+    return () => window.removeEventListener("settings-changed", handleSettingsChanged);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabledGroups, textFills }));
@@ -69,8 +94,8 @@ export function Output({ advancedMode, onToggleAdvancedMode }: { advancedMode: b
         return fillTemplate(group.template, fills);
       })
       .filter((line): line is string => Boolean(line))
-      .join("\n\n");
-  }, [enabledGroups, groups, textFills]);
+      .join("\n".repeat(spacesBetweenParagraphs + 1));
+  }, [enabledGroups, groups, textFills, spacesBetweenParagraphs]);
 
   const hasDataToClear = useMemo(() => {
     return Object.values(enabledGroups).some(Boolean) || Object.keys(textFills).length > 0;
@@ -197,7 +222,7 @@ export function Output({ advancedMode, onToggleAdvancedMode }: { advancedMode: b
       <Typography variant="h5" sx={{ textAlign: "center", mt: 2 }}>
         Output
       </Typography>
-      <Textbox label="Output" placeholder="Output will appear here once options are selected above." value={output} />
+      <Textbox placeholder="Output will appear here once options are selected above." value={output} />
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Button className="copy-clipboard-btn" variant="contained" color="primary" onClick={handleCopy} disabled={!output}>
           Copy to Clipboard

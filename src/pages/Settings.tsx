@@ -1,9 +1,11 @@
 import { Box, FormLabel, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import * as React from "react";
 import { applyThemeVars, DARK_THEMES, LIGHT_THEMES } from "../themeOptions";
+import NumberField from "../components/NumberField";
 
 const SETTINGS_DATA_KEY = "settings_data";
 const TEXT_ALIGNMENT_KEY = "text_alignment";
+const SPACES_BETWEEN_PARAGRAPHS_KEY = "spaces_between_paragraphs";
 const LIGHT_THEME_KEY = "light_theme_index";
 const DARK_THEME_KEY = "dark_theme_index";
 type TextAlignment = "left" | "center" | "right";
@@ -40,7 +42,12 @@ export function Settings() {
 
   const [textAlignment, setTextAlignment] = React.useState<TextAlignment>(() => {
     const settings = getSettings();
-    return (settings[TEXT_ALIGNMENT_KEY] as TextAlignment) || "center";
+    return (settings[TEXT_ALIGNMENT_KEY] as TextAlignment) || "left";
+  });
+
+  const [spacesBetweenParagraphs, setSpacesBetweenParagraphs] = React.useState<number>(() => {
+    const settings = getSettings();
+    return typeof settings[SPACES_BETWEEN_PARAGRAPHS_KEY] === "number" ? settings[SPACES_BETWEEN_PARAGRAPHS_KEY] : 1;
   });
 
   const [lightThemeIndex, setLightThemeIndex] = React.useState<number>(() => {
@@ -59,6 +66,14 @@ export function Settings() {
     if (newAlignment !== null) {
       setTextAlignment(newAlignment);
       saveSettings({ [TEXT_ALIGNMENT_KEY]: newAlignment });
+      window.dispatchEvent(new Event("settings-changed"));
+    }
+  };
+
+  const handleSpacesBetweenParagraphsChange = (value: number | null) => {
+    if (value !== null && value >= 0) {
+      setSpacesBetweenParagraphs(value);
+      saveSettings({ [SPACES_BETWEEN_PARAGRAPHS_KEY]: value });
       window.dispatchEvent(new Event("settings-changed"));
     }
   };
@@ -96,7 +111,7 @@ export function Settings() {
           alignItems: "center",
         }}
       >
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 3, display: "flex", flexDirection: "column", alignItems: "center" }}>
           <FormLabel
             sx={{
               display: "block",
@@ -120,6 +135,22 @@ export function Settings() {
               Right
             </ToggleButton>
           </ToggleButtonGroup>
+        </Box>
+
+        <Box sx={{ mb: 3, display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <FormLabel
+            sx={{
+              display: "block",
+              mb: 1,
+              fontSize: "1.25rem",
+              fontWeight: "bold",
+              color: "var(--text)",
+              textAlign: "center",
+            }}
+          >
+            Spaces Between Paragraphs
+          </FormLabel>
+          <NumberField size="small" value={spacesBetweenParagraphs} onValueChange={handleSpacesBetweenParagraphsChange} sx={{ width: 70 }} />
         </Box>
 
         <Box sx={{ mb: 3 }}>
@@ -203,10 +234,9 @@ function toggleGroupSx(isDarkMode: boolean) {
     flexWrap: "wrap",
     justifyContent: "center", // <-- centers buttons in each row
     bgcolor: isDarkMode ? "var(--surface)" : "transparent",
-    border: isDarkMode ? "1px solid var(--text)" : undefined,
     "& .MuiToggleButton-root": {
       color: "var(--text)",
-      border: isDarkMode ? "1px solid var(--text)" : undefined,
+      border: isDarkMode ? "1px solid var(--border)" : undefined,
       "&.Mui-selected": {
         bgcolor: isDarkMode ? "var(--surface-muted)" : undefined,
         color: "var(--text)",

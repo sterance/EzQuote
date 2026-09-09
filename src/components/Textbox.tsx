@@ -2,18 +2,16 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 
 interface TextboxProps {
-  label: string;
   placeholder?: string;
   value?: string;
 }
 
-export default function Textbox({ label, placeholder, value }: TextboxProps) {
+export default function Textbox({ placeholder, value }: TextboxProps) {
   return (
     <Box component="form" sx={{ width: "100%", "& .MuiTextField-root": { my: 2, width: "100%" } }} noValidate autoComplete="off">
       <div>
         <TextField
           id="outlined-textarea"
-          label={value?.trim() ? label : undefined}
           placeholder={placeholder}
           value={value ?? ""}
           multiline
