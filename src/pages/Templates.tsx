@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Box, Button, Stack } from "@mui/material";
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { DndContext, closestCenter, MouseSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { useTemplateStore } from "../hooks/useTemplateStore";
 import { GroupEditor } from "../components/GroupEditor";
@@ -10,7 +10,7 @@ export const Templates: React.FC = () => {
   const { groups, updateGroup, deleteGroup, addGroup, confirmNewGroup, cancelNewGroup, updateGroupFills, importData, reorderGroups, clearAll, editingGroupId, clearEditingGroupId, newGroupPending } = useTemplateStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const sensors = useSensors(useSensor(MouseSensor, { activationConstraint: { distance: 5 } }), useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }));
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;

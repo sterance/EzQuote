@@ -13,7 +13,8 @@ type NumberFieldProps = Omit<React.ComponentProps<typeof BaseNumberField.Root>, 
 };
 
 export default function NumberField({ id: idProp, label, error, size = "medium", sx, ...other }: NumberFieldProps) {
-  const id = idProp ?? React.useId();
+  const generatedId = React.useId();
+  const id = idProp ?? generatedId;
 
   return (
     <BaseNumberField.Root

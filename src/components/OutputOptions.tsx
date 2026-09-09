@@ -32,12 +32,12 @@ interface OutputOptionsProps {
 
 export default function OutputOptions({ fills, template, textFills = {}, enabled, onChange }: OutputOptionsProps) {
   const [textAlignment, setTextAlignment] = useState<TextAlignment>(() => {
-    return (getSettings()[TEXT_ALIGNMENT_KEY] as TextAlignment) || "center";
+    return (getSettings()[TEXT_ALIGNMENT_KEY] as TextAlignment) || "left";
   });
 
   useEffect(() => {
     const sync = () => {
-      setTextAlignment((getSettings()[TEXT_ALIGNMENT_KEY] as TextAlignment) || "center");
+      setTextAlignment((getSettings()[TEXT_ALIGNMENT_KEY] as TextAlignment) || "left");
     };
     window.addEventListener("storage", sync);
     window.addEventListener("settings-changed", sync);

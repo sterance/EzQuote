@@ -178,6 +178,10 @@ h1 {
   color: #fff;
 }
 
+.app-shell[data-theme="dark"] .output-group-toggle[data-checked="true"] {
+  color: #000;
+}
+
 .output-group-toggle[data-checked="true"]:hover {
   opacity: 0.92;
 }
@@ -326,6 +330,14 @@ h1 {
   background-color: var(--accent);
 }
 
+.main-content .template-clear-btn {
+  color: #fff;
+}
+
+.app-shell[data-theme="dark"] .main-content .template-clear-btn {
+  color: #000;
+}
+
 .main-content .copy-clipboard-btn:hover,
 .main-content .template-action-btn:hover {
   background-color: var(--accent);
@@ -410,6 +422,14 @@ h1 {
 .confirmation-modal .MuiButton-outlined {
   border-color: var(--border);
   color: var(--text);
+}
+
+.confirmation-modal .confirmation-modal-confirm {
+  color: #fff;
+}
+
+:root[data-theme="dark"] .confirmation-modal .confirmation-modal-confirm {
+  color: #000;
 }
 
 .confirmation-modal .MuiButton-outlined:hover {

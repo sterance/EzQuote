@@ -62,7 +62,7 @@ export const GroupEditorView: React.FC<GroupEditorViewProps> = ({ group, isExpan
         >
           {group.template}
         </Typography>
-        <Box component="span" className="tmpl-drag-handle" {...dragHandleAttributes} {...dragHandleListeners} sx={{ display: "flex", alignItems: "center", justifyContent: "center", cursor: "grab", color: "var(--text)" }}>
+        <Box component="span" className="tmpl-drag-handle" {...dragHandleAttributes} {...dragHandleListeners} sx={{ display: "flex", alignItems: "center", justifyContent: "center", cursor: "grab", color: "var(--text)", touchAction: "none", userSelect: "none" }}>
           <DragHandleIcon fontSize="small" />
         </Box>
       </Box>
