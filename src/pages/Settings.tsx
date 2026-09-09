@@ -232,7 +232,7 @@ export function Settings() {
 function toggleGroupSx(isDarkMode: boolean) {
   return {
     flexWrap: "wrap",
-    justifyContent: "center",  <-- centers buttons in each row
+    justifyContent: "center",
     bgcolor: isDarkMode ? "var(--surface)" : "transparent",
     "& .MuiToggleButton-root": {
       color: "var(--text)",
