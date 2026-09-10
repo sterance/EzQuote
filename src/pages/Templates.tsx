@@ -7,7 +7,7 @@ import { GroupEditor } from "../components/GroupEditor";
 import { ConfirmationModal } from "../components/ConfirmationModal";
 
 export const Templates: React.FC = () => {
-  const { groups, updateGroup, deleteGroup, addGroup, confirmNewGroup, cancelNewGroup, updateGroupFills, toggleStarredValue, importData, reorderGroups, clearAll, editingGroupId, clearEditingGroupId, newGroupPending } = useTemplateStore();
+  const { groups, updateGroup, deleteGroup, addGroup, confirmNewGroup, cancelNewGroup, updateGroupFills, toggleStarredValue, importData, exportData, reorderGroups, clearAll, editingGroupId, clearEditingGroupId, newGroupPending } = useTemplateStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const sensors = useSensors(useSensor(MouseSensor, { activationConstraint: { distance: 5 } }), useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }));
@@ -19,21 +19,20 @@ export const Templates: React.FC = () => {
     const activeData = active.data.current;
     const overData = over.data.current;
 
-    if (activeData?.type === "fill" && overData?.type === "fill") {
-      if (activeData.groupId !== overData.groupId || activeData.tag !== overData.tag) return;
+if (activeData?.type === "fill" && overData?.type === "fill") {
+       if (activeData.groupId !== overData.groupId || activeData.tag !== overData.tag) return;
 
-      const group = groups.find((candidate) => candidate.id === activeData.groupId);
-      if (!group) return;
+       const group = groups.find((candidate) => candidate.id === activeData.groupId);
+       if (!group) return;
 
-      const tag = String(activeData.tag);
-      const fillIds = group.fillIds[tag] ?? [];
-      const from = fillIds.indexOf(String(activeData.fillId));
-      const to = fillIds.indexOf(String(overData.fillId));
-      if (from !== -1 && to !== -1 && from !== to) {
-        updateGroupFills(group.id, { ...group.fills, [tag]: arrayMove(group.fills[tag] ?? [], from, to) }, { ...group.fillIds, [tag]: arrayMove(fillIds, from, to) });
-      }
-      return;
-    }
+       const tag = String(activeData.tag);
+       const from = (group.fills[tag] ?? []).findIndex(f => f.id === String(activeData.fillId));
+       const to = (group.fills[tag] ?? []).findIndex(f => f.id === String(overData.fillId));
+       if (from !== -1 && to !== -1 && from !== to) {
+         updateGroupFills(group.id, { ...group.fills, [tag]: arrayMove(group.fills[tag] ?? [], from, to) });
+       }
+       return;
+     }
 
     const oldIndex = groups.findIndex((g) => g.id === active.id);
     const newIndex = groups.findIndex((g) => g.id === over.id);
@@ -60,7 +59,7 @@ export const Templates: React.FC = () => {
   };
 
   const handleExport = () => {
-    const blob = new Blob([JSON.stringify(groups, null, 2)], {
+    const blob = new Blob([JSON.stringify(exportData(), null, 2)], {
       type: "application/json",
     });
     const url = URL.createObjectURL(blob);

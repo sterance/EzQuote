@@ -1,25 +1,14 @@
 import { useState, useEffect } from "react";
 import type { ButtonGroup } from "../types";
-import { extractTags, syncGroupFills, syncFillIds, syncStarredFillIds, generateId } from "../utils/templateUtils";
+import {
+  extractTags,
+  syncGroupFills,
+  generateId,
+  normalizeGroup,
+  serializeGroup,
+} from "../utils/templateUtils";
 
 const STORAGE_KEY = "template_data";
-
-const normalizeGroup = (group: Partial<ButtonGroup>): ButtonGroup => {
-  const id = group.id ?? generateId();
-  const fills = group.fills ?? {};
-  const fillIds = group.fillIds ?? {};
-  const starredFillIds = group.starredFillIds ?? {};
-  const tags = extractTags(group.template ?? "");
-
-  return {
-    id,
-    label: group.label ?? "",
-    template: group.template ?? "",
-    fills: syncGroupFills(fills, tags),
-    fillIds: syncFillIds(fillIds, fills, tags, generateId),
-    starredFillIds: syncStarredFillIds(starredFillIds, fillIds, tags),
-  };
-};
 
 export const useTemplateStore = () => {
   const [groups, setGroups] = useState<ButtonGroup[]>(() => {
@@ -46,18 +35,21 @@ export const useTemplateStore = () => {
     setGroups((prev) =>
       prev.map((group) => {
         if (group.id !== groupId) return group;
-
         const newTags = extractTags(newTemplate);
-        const updatedFills = syncGroupFills(group.fills || {}, newTags);
-        const updatedFillIds = syncFillIds(group.fillIds, updatedFills, newTags, generateId);
-
+        const updatedFills = syncGroupFills(group.fills ?? {}, newTags);
+        const fills: ButtonGroup["fills"] = {};
+        for (const tag of newTags) {
+          fills[tag] = (updatedFills[tag] ?? []).map((f) => ({
+            id: f.id ?? generateId(),
+            text: f.text ?? "",
+            starred: Boolean(f.starred),
+          }));
+        }
         return {
           ...group,
           label: newLabel,
           template: newTemplate,
-          fills: updatedFills,
-          fillIds: updatedFillIds,
-          starredFillIds: syncStarredFillIds(group.starredFillIds, updatedFillIds, newTags),
+          fills,
         };
       }),
     );
@@ -82,8 +74,6 @@ export const useTemplateStore = () => {
       label: "",
       template: "",
       fills: {},
-      fillIds: {},
-      starredFillIds: {},
     };
     setGroups((prev) => [...prev, newGroup]);
     setNewGroupPending(true);
@@ -100,17 +90,10 @@ export const useTemplateStore = () => {
     setEditingGroupId(null);
   };
 
-  const updateGroupFills = (groupId: string, fills: Record<string, string[]>, fillIds?: Record<string, string[]>) => {
+  const updateGroupFills = (groupId: string, fills: ButtonGroup["fills"]) => {
     setGroups((prev) =>
       prev.map((group) =>
-        group.id === groupId
-          ? {
-              ...group,
-              fills,
-              fillIds: fillIds ?? syncFillIds(group.fillIds, fills, extractTags(group.template), generateId),
-              starredFillIds: syncStarredFillIds(group.starredFillIds, fillIds ?? group.fillIds, extractTags(group.template)),
-            }
-          : group,
+        group.id === groupId ? { ...group, fills } : group,
       ),
     );
   };
@@ -119,24 +102,18 @@ export const useTemplateStore = () => {
     setGroups((prev) =>
       prev.map((group) => {
         if (group.id !== groupId) return group;
-        const current = group.starredFillIds?.[tag] ?? [];
-        const next = current.includes(fillId)
-          ? current.filter((id) => id !== fillId)
-          : [...current, fillId];
-        return {
-          ...group,
-          starredFillIds: {
-            ...(group.starredFillIds || {}),
-            [tag]: next,
-          },
-        };
+        const fills = { ...group.fills };
+        fills[tag] = (fills[tag] ?? []).map((f) =>
+          f.id === fillId ? { ...f, starred: !f.starred } : f,
+        );
+        return { ...group, fills };
       }),
     );
   };
 
   const importData = (jsonData: string) => {
     try {
-      const parsed = JSON.parse(jsonData);
+      const parsed = JSON.parse(jsonData) as Array<Partial<ButtonGroup>>;
       if (Array.isArray(parsed) && parsed.every((g) => typeof g.label === "string" && g.label.length > 0 && typeof g.template === "string")) {
         setGroups(parsed.map((g) => normalizeGroup({ ...g, id: generateId() })));
         return true;
@@ -152,6 +129,10 @@ export const useTemplateStore = () => {
     setGroups([]);
   };
 
+  const exportData = () => {
+    return groups.map(serializeGroup);
+  };
+
   return {
     groups,
     updateGroup,
@@ -162,6 +143,7 @@ export const useTemplateStore = () => {
     updateGroupFills,
     toggleStarredValue,
     importData,
+    exportData,
     reorderGroups,
     clearAll,
     editingGroupId,

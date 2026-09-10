@@ -7,6 +7,7 @@ import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useMemo, useState, useEffect } from "react";
+import type { ButtonGroup } from "../types";
 import { extractTags } from "../utils/templateUtils";
 
 const SETTINGS_DATA_KEY = "settings_data";
@@ -23,16 +24,14 @@ function getSettings(): Record<string, unknown> {
 }
 
 interface OutputOptionsProps {
-  fills: Record<string, string[]>;
-  fillIds: Record<string, string[]>;
-  starredFillIds: Record<string, string[]>;
+  fills: ButtonGroup["fills"];
   template: string;
   textFills?: Record<string, string[]>;
   enabled: boolean;
   onChange: (fills: Record<string, string[]>) => void;
 }
 
-export default function OutputOptions({ fills, fillIds, starredFillIds, template, textFills = {}, enabled, onChange }: OutputOptionsProps) {
+export default function OutputOptions({ fills, template, textFills = {}, enabled, onChange }: OutputOptionsProps) {
   const [textAlignment, setTextAlignment] = useState<TextAlignment>(() => {
     return (getSettings()[TEXT_ALIGNMENT_KEY] as TextAlignment) || "left";
   });
@@ -70,27 +69,16 @@ export default function OutputOptions({ fills, fillIds, starredFillIds, template
       }}
     >
       {tags.map((tag) => {
-        const hasTemplateFills = (fills[tag]?.length || 0) > 0;
+        const fillsForTag = fills[tag] ?? [];
+        const hasTemplateFills = fillsForTag.length > 0;
 
         if (hasTemplateFills) {
-          const list = fills[tag];
-          const fillIdsForTag = fillIds?.[tag] ?? [];
-          const starredIds = starredFillIds?.[tag] ?? [];
           const textFillsForTag = textFills?.[tag];
           const isUntouched = textFillsForTag === undefined;
 
-          const sortedList = list
-            .map((val, i) => ({ val, id: fillIdsForTag[i] }))
-            .sort((a, b) => {
-              const aStarred = starredIds.includes(a.id);
-              const bStarred = starredIds.includes(b.id);
-              if (aStarred && !bStarred) return -1;
-              if (!aStarred && bStarred) return 1;
-              return 0;
-            })
-            .map((p) => p.val);
+          const sortedList = [...fillsForTag].sort((a, b) => Number(b.starred) - Number(a.starred));
 
-          const selectedValues = isUntouched ? list.filter((_, i) => starredIds.includes(fillIdsForTag[i])) : (textFillsForTag ?? []);
+          const selectedValues = isUntouched ? fillsForTag.filter((f) => f.starred).map((f) => f.text) : (textFillsForTag ?? []);
 
           const selectId = `dropdown-${tag}`;
           const displayValue = (() => {
@@ -131,30 +119,33 @@ export default function OutputOptions({ fills, fillIds, starredFillIds, template
                   },
                 }}
               >
-                {sortedList.map((val) => (
-                  <MenuItem key={val} value={val}>
-                    <Checkbox
-                      checked={selectedValues.includes(val)}
-                      sx={{
-                        p: 0.5,
-                        color: "var(--text-muted)",
-                        "&.Mui-checked": { color: "var(--accent)" },
-                      }}
-                    />
-                    <ListItemText
-                      sx={{
-                        display: "flex",
-                        flex: 1,
-                        m: 0,
-                      }}
-                      primary={
-                        <Typography component="span" sx={{ textAlign: textAlignment, width: "100%" }}>
-                          {val}
-                        </Typography>
-                      }
-                    />
-                  </MenuItem>
-                ))}
+                {sortedList.map((fill) => {
+                  const val = fill.text;
+                  return (
+                    <MenuItem key={fill.id} value={val}>
+                      <Checkbox
+                        checked={selectedValues.includes(val)}
+                        sx={{
+                          p: 0.5,
+                          color: "var(--text-muted)",
+                          "&.Mui-checked": { color: "var(--accent)" },
+                        }}
+                      />
+                      <ListItemText
+                        sx={{
+                          display: "flex",
+                          flex: 1,
+                          m: 0,
+                        }}
+                        primary={
+                          <Typography component="span" sx={{ textAlign: textAlignment, width: "100%" }}>
+                            {val}
+                          </Typography>
+                        }
+                      />
+                    </MenuItem>
+                  );
+                })}
               </Select>
             </FormControl>
           );

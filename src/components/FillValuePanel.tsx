@@ -35,8 +35,7 @@ export const FillValuePanel: React.FC<FillValuePanelProps> = ({ group, groupTags
         </Typography>
       ) : (
         groupTags.map((tag) => {
-          const list = (group.fills || {})[tag] ?? [];
-          const fillIds = (group.fillIds || {})[tag] ?? [];
+          const fills = (group.fills || {})[tag] ?? [];
           return (
             <Box
               key={tag}
@@ -56,7 +55,7 @@ export const FillValuePanel: React.FC<FillValuePanelProps> = ({ group, groupTags
                 {tag}
               </Typography>
               <Divider />
-              {list.length === 0 ? (
+              {fills.length === 0 ? (
                 <Typography variant="caption" color="text.secondary" sx={{ textAlign: "center" }}>
                   No fill values yet. This fill will appear as a custom text input in the{" "}
                   <Link component={RouterLink} to="/output">
@@ -65,24 +64,22 @@ export const FillValuePanel: React.FC<FillValuePanelProps> = ({ group, groupTags
                   .
                 </Typography>
               ) : (
-                <SortableContext items={list.map((_, i) => `fill:${group.id}:${fillIds[i]}`)}>
-                  {list.map((value, idx) => {
-                    const fillId = fillIds[idx];
-                    const starredForTag = (group.starredFillIds || {})[tag] ?? [];
-                    const isStarred = starredForTag.includes(fillId);
+                <SortableContext items={fills.map((f) => `fill:${group.id}:${f.id}`)}>
+                  {fills.map((fill, idx) => {
+                    const isStarred = fill.starred ?? false;
                     return (
                       <SortableFillRow
-                        key={fillId}
-                        id={`fill:${group.id}:${fillId}`}
+                        key={fill.id}
+                        id={`fill:${group.id}:${fill.id}`}
                         groupId={group.id}
-                        fillId={fillId}
+                        fillId={fill.id}
                         tag={tag}
                         index={idx}
-                        value={value}
+                        value={fill.text}
                         onChange={(v) => onUpdateValue(tag, idx, v)}
                         onDelete={() => onDeleteValue(tag, idx)}
                         isStarred={isStarred}
-                        onToggleStar={() => onToggleStar(tag, fillId)}
+                        onToggleStar={() => onToggleStar(tag, fill.id)}
                       />
                     );
                   })}

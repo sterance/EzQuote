@@ -90,11 +90,7 @@ export function Output({ advancedMode, onToggleAdvancedMode }: { advancedMode: b
         const groupFills = textFills[group.id] ?? {};
         for (const tag of tags) {
           if (groupFills[tag] === undefined) {
-            const starredIds = group.starredFillIds?.[tag] ?? [];
-            const fillIds = group.fillIds[tag] ?? [];
-            const values = group.fills[tag] ?? [];
-            const starredSet = new Set(starredIds);
-            fills[tag] = values.filter((_, i) => starredSet.has(fillIds[i]));
+            fills[tag] = (group.fills[tag] ?? []).filter((f) => f.starred).map((f) => f.text);
           } else {
             fills[tag] = groupFills[tag];
           }
@@ -211,8 +207,6 @@ export function Output({ advancedMode, onToggleAdvancedMode }: { advancedMode: b
             <OutputGroup key={group.id} label={group.label} enabled={Boolean(enabledGroups[group.id])} onToggleEnabled={(enabled) => handleToggleGroup(group.id, enabled)} sx={{ mt: index === 0 ? 4 : 0 }}>
               <OutputOptions
                 fills={group.fills || {}}
-                fillIds={group.fillIds || {}}
-                starredFillIds={group.starredFillIds || {}}
                 template={group.template}
                 textFills={textFills[group.id] ?? {}}
                 enabled={Boolean(enabledGroups[group.id])}

@@ -13,7 +13,7 @@ interface GroupEditorProps {
   group: ButtonGroup;
   updateGroup: (id: string, label: string, template: string) => void;
   deleteGroup: () => void;
-  updateGroupFills: (fills: Record<string, string[]>, fillIds?: Record<string, string[]>) => void;
+  updateGroupFills: (fills: ButtonGroup["fills"]) => void;
   onToggleStar: (tag: string, fillId: string) => void;
   confirmAction: (msg: string, action: () => void) => void;
   editingGroupId: string | null;
@@ -74,6 +74,12 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: group.id,
   });
+
+  useEffect(() => {
+    if (isDragging && isExpanded) {
+      setTimeout(() => setIsExpanded(false), 0);
+    }
+  }, [isDragging, isExpanded]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -176,23 +182,19 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
 
   const handleAddValue = (tag: string) => {
     const list = (group.fills || {})[tag] ?? [];
-    const fillIds = group.fillIds || {};
     const nextFillId = generateId();
-    const next: Record<string, string[]> = {
+    const next: ButtonGroup["fills"] = {
       ...(group.fills || {}),
-      [tag]: [...list, ""],
+      [tag]: [...list, { id: nextFillId, text: "", starred: false }],
     };
-    updateGroupFills(next, {
-      ...fillIds,
-      [tag]: [...(fillIds[tag] ?? []), nextFillId],
-    });
+    updateGroupFills(next);
   };
 
   const handleUpdateValue = (tag: string, index: number, value: string) => {
     const list = (group.fills || {})[tag] ?? [];
-    const next: Record<string, string[]> = {
+    const next: ButtonGroup["fills"] = {
       ...(group.fills || {}),
-      [tag]: list.map((v, i) => (i === index ? value : v)),
+      [tag]: list.map((f, i) => (i === index ? { ...f, text: value } : f)),
     };
     updateGroupFills(next);
   };
@@ -211,15 +213,11 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
 
   const commitDeleteValue = (tag: string, index: number) => {
     const list = (group.fills || {})[tag] ?? [];
-    const fillIds = group.fillIds || {};
-    const next: Record<string, string[]> = {
+    const next: ButtonGroup["fills"] = {
       ...(group.fills || {}),
       [tag]: list.filter((_, i) => i !== index),
     };
-    updateGroupFills(next, {
-      ...fillIds,
-      [tag]: (fillIds[tag] ?? []).filter((_, i) => i !== index),
-    });
+    updateGroupFills(next);
   };
 
   const handleTemplateRef = (el: HTMLInputElement | HTMLTextAreaElement | null) => {
