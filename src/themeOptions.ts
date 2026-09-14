@@ -73,7 +73,7 @@ export const LIGHT_THEMES: ThemeOption[] = [
     navText: "#f4f0f2",
   },
   {
-    label: "Sunset",
+    label: "Autumn",
     pageBg: "#f4f2f1",
     surface: "#fafaf9",
     surfaceMuted: "#ebe7e5",
@@ -196,7 +196,7 @@ export const DARK_THEMES: ThemeOption[] = [
     navText: "#ebe5e8",
   },
   {
-    label: "Sunset",
+    label: "Autumn",
     pageBg: "#1b1613",
     surface: "#2a221d",
     surfaceMuted: "#362b26",
