@@ -1,7 +1,7 @@
 import { Alert, Box, Button, Link, Snackbar, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import * as React from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useLocation } from "react-router-dom";
 import { useTemplateStore } from "../hooks/useTemplateStore";
 import OutputGroup from "../components/OutputGroup";
 import OutputOptions from "../components/OutputOptions";
@@ -9,10 +9,9 @@ import Textbox from "../components/Textbox";
 import { extractTags } from "../utils/templateUtils";
 import { formatSelections } from "../utils/textFormatting";
 import { ConfirmationModal } from "../components/ConfirmationModal";
-import AdjustIcon from "@mui/icons-material/Adjust";
-import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 
 const STORAGE_KEY = "output_data";
+const DEMO_STORAGE_KEY = "output_data_demo";
 const SETTINGS_DATA_KEY = "settings_data";
 const SPACES_BETWEEN_PARAGRAPHS_KEY = "spaces_between_paragraphs";
 
@@ -29,10 +28,12 @@ function fillTemplate(template: string, fills: Record<string, string[]>) {
   return template.replace(/\{(\w+)\}/g, (_, key: string) => formatSelections(fills[key] ?? []));
 }
 
-export function Output({ advancedMode, onToggleAdvancedMode }: { advancedMode: boolean; onToggleAdvancedMode: () => void }) {
+export function Output() {
+  const location = useLocation();
+  const outputStorageKey = location.pathname.startsWith("/demo") ? DEMO_STORAGE_KEY : STORAGE_KEY;
   const { groups } = useTemplateStore();
   const [enabledGroups, setEnabledGroups] = useState<Record<string, boolean>>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(outputStorageKey);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -44,7 +45,7 @@ export function Output({ advancedMode, onToggleAdvancedMode }: { advancedMode: b
     return {};
   });
   const [textFills, setTextFills] = useState<Record<string, Record<string, string[]>>>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(outputStorageKey);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -70,8 +71,8 @@ export function Output({ advancedMode, onToggleAdvancedMode }: { advancedMode: b
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabledGroups, textFills }));
-  }, [enabledGroups, textFills]);
+    localStorage.setItem(outputStorageKey, JSON.stringify({ enabledGroups, textFills }));
+  }, [enabledGroups, outputStorageKey, textFills]);
 
   const handleToggleGroup = (groupId: string, enabled: boolean) => {
     setEnabledGroups((current) => ({ ...current, [groupId]: enabled }));
@@ -159,23 +160,6 @@ export function Output({ advancedMode, onToggleAdvancedMode }: { advancedMode: b
           gap: 2,
         }}
       >
-        <Button
-          variant="outlined"
-          color="error"
-          size="small"
-          onClick={onToggleAdvancedMode}
-          className="advanced-btn"
-          startIcon={advancedMode ? <RocketLaunchIcon /> : <AdjustIcon />}
-          sx={{
-            position: "absolute",
-            top: 8,
-            left: 8,
-            zIndex: 1,
-            display: "none", // button disabled until simple/advanced functionality implemented, remove this line to re-enable
-          }}
-        >
-          {advancedMode ? "Advanced Mode" : "Simple Mode"}
-        </Button>
         {groups.length > 0 && (
           <>
             <Typography variant="h5" sx={{ position: "absolute", left: "50%", transform: "translate(-50%, -50%)" }}>

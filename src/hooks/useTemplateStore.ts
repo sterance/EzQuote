@@ -1,18 +1,23 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import type { ButtonGroup } from "../types";
-import {
-  extractTags,
-  syncGroupFills,
-  generateId,
-  normalizeGroup,
-  serializeGroup,
-} from "../utils/templateUtils";
+import sampleTemplates from "../data/sample-templates.json";
+import { extractTags, syncGroupFills, generateId, normalizeGroup, serializeGroup } from "../utils/templateUtils";
 
 const STORAGE_KEY = "template_data";
+const DEMO_STORAGE_KEY = "template_data_demo";
+
+export const getInitialDemoTemplates = (): ButtonGroup[] => sampleTemplates.map((template) => normalizeGroup(template as Partial<ButtonGroup>));
 
 export const useTemplateStore = () => {
+  const location = useLocation();
+  const storageKey = location.pathname.startsWith("/demo") ? DEMO_STORAGE_KEY : STORAGE_KEY;
   const [groups, setGroups] = useState<ButtonGroup[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    if (storageKey === DEMO_STORAGE_KEY && localStorage.getItem(DEMO_STORAGE_KEY) === null) {
+      localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(getInitialDemoTemplates()));
+    }
+
+    const saved = localStorage.getItem(storageKey);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -28,8 +33,8 @@ export const useTemplateStore = () => {
   const [newGroupPending, setNewGroupPending] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
-  }, [groups]);
+    localStorage.setItem(storageKey, JSON.stringify(groups));
+  }, [groups, storageKey]);
 
   const updateGroup = (groupId: string, newLabel: string, newTemplate: string) => {
     setGroups((prev) =>
@@ -91,11 +96,7 @@ export const useTemplateStore = () => {
   };
 
   const updateGroupFills = (groupId: string, fills: ButtonGroup["fills"]) => {
-    setGroups((prev) =>
-      prev.map((group) =>
-        group.id === groupId ? { ...group, fills } : group,
-      ),
-    );
+    setGroups((prev) => prev.map((group) => (group.id === groupId ? { ...group, fills } : group)));
   };
 
   const toggleStarredValue = (groupId: string, tag: string, fillId: string) => {
@@ -103,9 +104,7 @@ export const useTemplateStore = () => {
       prev.map((group) => {
         if (group.id !== groupId) return group;
         const fills = { ...group.fills };
-        fills[tag] = (fills[tag] ?? []).map((f) =>
-          f.id === fillId ? { ...f, starred: !f.starred } : f,
-        );
+        fills[tag] = (fills[tag] ?? []).map((f) => (f.id === fillId ? { ...f, starred: !f.starred } : f));
         return { ...group, fills };
       }),
     );
@@ -125,7 +124,7 @@ export const useTemplateStore = () => {
   };
 
   const clearAll = () => {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(storageKey);
     setGroups([]);
   };
 
