@@ -59,9 +59,6 @@ function App() {
   useEffect(() => {
     if (!isDemoRoute) return;
 
-    if (localStorage.getItem(DEMO_STORAGE_KEY) === null) {
-      localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(getInitialDemoTemplates()));
-    }
     if (localStorage.getItem(DEMO_OUTPUT_STORAGE_KEY) === null) {
       localStorage.setItem(DEMO_OUTPUT_STORAGE_KEY, JSON.stringify({ enabledGroups: {}, textFills: {} }));
     }
