@@ -2,10 +2,73 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import type { ButtonGroup } from "../types";
 import sampleTemplates from "../data/sample-templates.json";
+import demoData from "../data/demo-data.json";
 import { extractTags, syncGroupFills, generateId, normalizeGroup, serializeGroup } from "../utils/templateUtils";
 
 const STORAGE_KEY = "template_data";
 const DEMO_STORAGE_KEY = "template_data_demo";
+const DEMO_OUTPUT_STORAGE_KEY = "output_data_demo";
+
+interface DemoData {
+  output_data_demo?: {
+    enabledGroupsByLabel?: string[];
+    textFillsByLabel?: Record<string, Record<string, string[]>>;
+  };
+  template_data_demo?: {
+    starredFillsByLabel?: Array<{
+      groupLabel: string;
+      tag: string;
+      fillText: string;
+    }>;
+  };
+}
+
+export function applyDemoDataPreseeding(groups: ButtonGroup[]): ButtonGroup[] {
+  const demo = demoData as DemoData;
+
+  // Apply output_data_demo pre-seeding
+  if (demo.output_data_demo?.enabledGroupsByLabel) {
+    const enabledGroupsByLabel = demo.output_data_demo.enabledGroupsByLabel;
+    const enabledGroups: Record<string, boolean> = {};
+    const textFills: Record<string, Record<string, string[]>> = {};
+
+    for (const group of groups) {
+      const configuredFills = demo.output_data_demo.textFillsByLabel?.[group.label];
+      if (enabledGroupsByLabel.includes(group.label)) {
+        enabledGroups[group.id] = true;
+      }
+      if (configuredFills) {
+        textFills[group.id] = configuredFills;
+      } else if (enabledGroups[group.id]) {
+        textFills[group.id] = {};
+      }
+    }
+
+    localStorage.setItem(DEMO_OUTPUT_STORAGE_KEY, JSON.stringify({ enabledGroups, textFills }));
+  }
+
+  // Apply template_data_demo modifications
+  if (demo.template_data_demo?.starredFillsByLabel) {
+    const starredFillsByLabel = demo.template_data_demo.starredFillsByLabel;
+
+    const modifiedGroups = groups.map((group) => {
+      const groupMods = starredFillsByLabel.filter((m) => m.groupLabel === group.label);
+      if (groupMods.length === 0) return group;
+
+      const newFills = { ...group.fills };
+      for (const mod of groupMods) {
+        if (newFills[mod.tag]) {
+          newFills[mod.tag] = newFills[mod.tag].map((f) => (f.text === mod.fillText ? { ...f, starred: true } : f));
+        }
+      }
+      return { ...group, fills: newFills };
+    });
+
+    return modifiedGroups;
+  }
+
+  return groups;
+}
 
 export const getInitialDemoTemplates = (): ButtonGroup[] => sampleTemplates.map((template) => normalizeGroup(template as Partial<ButtonGroup>));
 
@@ -14,7 +77,9 @@ export const useTemplateStore = () => {
   const storageKey = location.pathname.startsWith("/demo") ? DEMO_STORAGE_KEY : STORAGE_KEY;
   const [groups, setGroups] = useState<ButtonGroup[]>(() => {
     if (storageKey === DEMO_STORAGE_KEY && localStorage.getItem(DEMO_STORAGE_KEY) === null) {
-      localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(getInitialDemoTemplates()));
+      const initialTemplates = getInitialDemoTemplates();
+      const preseededTemplates = applyDemoDataPreseeding(initialTemplates);
+      localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(preseededTemplates));
     }
 
     const saved = localStorage.getItem(storageKey);

@@ -1,0 +1,35 @@
+{
+  "output_data_demo": {
+    "enabledGroupsByLabel": ["Greeting", "Power Supply", "Thank You Closing", "Signature"],
+    "textFillsByLabel": {
+      "Greeting": {
+        "name": ["Joshua"]
+      },
+      "Power Supply": {
+        "item": ["internal power supply unit"],
+        "condition": ["a blown internal fuse"],
+        "requirement": ["fuse replacement and a check for the underlying cause"],
+        "timeframe": ["2 weeks"]
+      }
+    }
+  },
+  "template_data_demo": {
+    "starredFillsByLabel": [
+      {
+        "groupLabel": "Broken Cable",
+        "tag": "condition",
+        "fillText": "flooded"
+      },
+      {
+        "groupLabel": "Broken Cable",
+        "tag": "condition",
+        "fillText": "broken pins"
+      },
+      {
+        "groupLabel": "Broken Cable",
+        "tag": "requirement",
+        "fillText": "replacement of the connector"
+      }
+    ]
+  }
+}

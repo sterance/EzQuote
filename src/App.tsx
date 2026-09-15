@@ -7,7 +7,7 @@ import { Help } from "./pages/Help";
 import { Settings } from "./pages/Settings";
 import { Templates } from "./pages/Templates";
 import { ConfirmationModal } from "./components/ConfirmationModal";
-import { getInitialDemoTemplates } from "./hooks/useTemplateStore";
+import { applyDemoDataPreseeding, getInitialDemoTemplates } from "./hooks/useTemplateStore";
 import { applyThemeVars, DARK_THEMES, LIGHT_THEMES } from "./themeOptions";
 
 const DARK_MODE_KEY = "dark_mode";
@@ -76,7 +76,8 @@ function App() {
   };
 
   const resetDemoTemplates = () => {
-    localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(getInitialDemoTemplates()));
+    const initialTemplates = applyDemoDataPreseeding(getInitialDemoTemplates());
+    localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(initialTemplates));
     setIsResetModalOpen(false);
     window.location.reload();
   };
